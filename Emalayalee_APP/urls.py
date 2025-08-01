@@ -4,7 +4,9 @@ from . import views
 
 
 urlpatterns = [
+
     path('api-login/', views.Login.as_view(), name="login"),
+    
     # -------------------- NEWS --------------------
     # Get all news (paginated)
     path('news/', views.get_news, name='get_news'),

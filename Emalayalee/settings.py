@@ -1,4 +1,5 @@
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -8,10 +9,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-$9^$e+tt1+=$$5c##*xsn1o@9d&84=95ao1isr86bgm+jv629n'
-
+SECRET_KEY = config('SECRET_KEY', default='fallback-secret-key')
+DEBUG = config('DEBUG', default=False, cast=bool)
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -76,20 +76,20 @@ WSGI_APPLICATION = 'Emalayalee.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'emalayal_db1',
-        'USER': 'admin',
-        'PASSWORD': '3SmjN8ipvNWUDBBIj7z3',
-        'HOST': 'database-em-legacy.cziykagemhfv.us-east-1.rds.amazonaws.com',  # Or your DB server IP
-        'PORT': '3306',
+        'NAME': config('DB_NAME', default='emalayal_db1'),
+        'USER': config('DB_USER', default='admin'),
+        'PASSWORD': config('DB_PASSWORD', default=''),
+        'HOST': config('DB_HOST', default='127.0.0.1'),
+        'PORT': config('DB_PORT', default='3306'),
         'OPTIONS': {
             'charset': 'utf8mb4',
         }
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
