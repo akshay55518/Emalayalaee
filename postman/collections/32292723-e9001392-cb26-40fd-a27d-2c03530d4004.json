@@ -163,6 +163,18 @@
 						"header": []
 					},
 					"response": []
+				},
+				{
+					"name": "Login",
+					"id": "32292723-91f19d5d-bdca-48a3-97b2-0e12bcb0284f",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
 				}
 			],
 			"id": "32292723-95900d37-87e8-4bde-bd0c-f70df468d04c"
@@ -466,18 +478,6 @@
 				}
 			],
 			"id": "32292723-647705c5-1b82-4779-bcf1-885a6cf005da"
-		},
-		{
-			"name": "Login",
-			"id": "32292723-91f19d5d-bdca-48a3-97b2-0e12bcb0284f",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": []
-			},
-			"response": []
 		}
 	]
 }
