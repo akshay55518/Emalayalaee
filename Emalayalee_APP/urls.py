@@ -98,5 +98,5 @@ urlpatterns = [
     # Mark post as posted in social media
     path('post-marked-social/<int:news_id>/<int:account_id>/', views.mark_as_posted_view, name='mark_as_posted'),
     
-    path('advertise/', views.advertise, name='advertise')
+    # path('advertise/', views.advertise, name='advertise')
 ]

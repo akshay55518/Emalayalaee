@@ -20,7 +20,11 @@ def get_paginated_list(request, table_name, order_by="id"):
 
 
 # -------- Full data API endpoints --------
+@jwt_required
 def get_news(request):
+    user_id = getattr(request, "user_id", None)
+    if not user_id:
+        raise ValueError("User ID is missing. Did you forget to protect the route with @jwt_required?")
     return get_paginated_list(request, "newsmalayalam", order_by="id")
 
 
@@ -35,8 +39,8 @@ def get_charamam(request):
 def get_writers(request):
     return get_paginated_list(request, "writers", order_by="id")
 
-def advertise(request):
-    return get_paginated_list(request, "advertisement_new", order_by="id")
+# def advertise(request):
+#     return get_paginated_list(request, "advertisement_new", order_by="id")
 
 def get_comments_for_record(record_id, table_name):
     with connection.cursor() as cursor:
@@ -49,12 +53,6 @@ def get_comments_for_record(record_id, table_name):
         columns = [col[0] for col in cursor.description]
         comments = [dict(zip(columns, row)) for row in rows]
     return fix_mojibake(comments)
-
-def get_editors():
-    with connection.cursor() as cursor:
-        cursor.execute(
-            "SELECT "
-        )
 
 
 # -------- Fetch data by ID --------
@@ -209,7 +207,7 @@ def delete_news_view(request, news_id):
 
 @csrf_exempt
 def permanently_delete_news_view(request, news_id):
-    if request.method != "POST":
+    if request.method != "DELETE":
         return JsonResponse({"error": "Method not allowed"}, status=405)
     deleted = permanently_delete_news(news_id)
     if deleted:
@@ -358,7 +356,7 @@ def edit_news_view(request, news_id):
             news_data, json_dumps_params={"ensure_ascii": False}, safe=False
         )
 
-    elif request.method == "POST":
+    elif request.method == "PATCH":
         date_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         fields = {
             "newsType": request.POST.get("newsType"),
