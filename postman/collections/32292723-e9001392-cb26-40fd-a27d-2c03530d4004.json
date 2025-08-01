@@ -495,7 +495,7 @@
 					"response": []
 				},
 				{
-					"name": "New Request",
+					"name": "edit editor",
 					"id": "32292723-00e048ab-27eb-4ba0-ba36-219a89d2ade9",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
