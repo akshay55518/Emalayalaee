@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 # CDN Base URL from environment (default: empty)
-cdn_base = os.getenv("CDN", "").rstrip("/")
+# cdn_base = os.getenv("CDN", "").rstrip("/")
 
 # Static Bunny CDN URLs
 base_featured_url = "https://ccdn.emalayalee.com/featured-image/"
@@ -11,6 +11,7 @@ base_image_url = "https://ccdn.emalayalee.com/images/"
 base_pdf_url = "https://ccdn.emalayalee.com/pdf/"
 base_charaman_home_url = "https://ccdn.emalayalee.com/charamam/home-image/"
 base_charaman_images_url = "https://ccdn.emalayalee.com/charamam/charamam-images/"
+cdn_base = "https://emalayalee.b-cdn.net"
 
 def add_full_urls(record, table_name="news"):
     """Enhance a record with full URLs for images, PDF, etc. Supports newsmalayalam & charamam."""
@@ -31,6 +32,9 @@ def add_full_urls(record, table_name="news"):
     # Handle paid flag
     if "paid" in record:
         record["paid"] = record["paid"] != 0
+    
+    if "paid" in record:
+        record["need_subscription"] = bool(record["paid"])
 
     cdn_type = (record.get("cdn") or "").lower()
     id_ = record.get("id", "")
@@ -46,7 +50,7 @@ def add_full_urls(record, table_name="news"):
                 record["images"] = [f"{base_image_url}{img}" for img in img_list]
             else:
                 record["images"] = []
-            record["pdf_url"] = f"{base_pdf_url}{record['pdf']}" if record.get("pdf") else None
+            # record["pdf_url"] = f"{base_pdf_url}{record['pdf']}" if record.get("pdf") else None
         else:
             record["images2"] = (
                 f"{cdn_base}/photo/{record['images2']}" if record.get("images2") else None
@@ -56,7 +60,7 @@ def add_full_urls(record, table_name="news"):
                 record["images"] = [f"{cdn_base}/photo/{img}" for img in img_list]
             else:
                 record["images"] = []
-            record["pdf_url"] = f"{cdn_base}/pdf/{record['pdf']}" if record.get("pdf") else None
+            # record["pdf_url"] = f"{cdn_base}/pdf/{record['pdf']}" if record.get("pdf") else None
 
     # CHARAMAM TABLE
     elif table_name == "charamam":

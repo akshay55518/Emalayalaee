@@ -1,15 +1,16 @@
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 from django.utils.timezone import now
 from .db_access import *
 from .utils import fix_mojibake
-
+from .login_authetication import jwt_required
+from .db_access import mark_post_as_posted
+from django.http import JsonResponse
 
 # -------- Helper for pagination ----------
 def get_paginated_list(request, table_name, order_by="id"):
-    page = int(request.GET.get("page", 1))
-    page_size = int(request.GET.get("page_size", 15))
+    page = int(request.GET.get("page[number]", request.GET.get("page", 1)))
+    page_size = int(request.GET.get("page[size]", request.GET.get("page_size", 15)))
     data = get_paginated_table_data(
         table_name, page=page, page_size=page_size, request=request, order_by=order_by
     )
@@ -34,14 +35,53 @@ def get_charamam(request):
 def get_writers(request):
     return get_paginated_list(request, "writers", order_by="id")
 
+def advertise(request):
+    return get_paginated_list(request, "advertisement_new", order_by="id")
+
+def get_comments_for_record(record_id, table_name):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT id, name, email, cmd as comment, date, ip_address, status "
+            "FROM cmd2 WHERE newsid = %s AND newsType = %s ORDER BY date DESC",
+            [record_id, table_name]
+        )
+        rows = cursor.fetchall()
+        columns = [col[0] for col in cursor.description]
+        comments = [dict(zip(columns, row)) for row in rows]
+    return fix_mojibake(comments)
+
+def get_editors():
+    with connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT "
+        )
+
 
 # -------- Fetch data by ID --------
 def get_record_by_id_view(request, table_name, record_id, field_map=None):
     record = get_record_by_id(table_name, record_id, field_map)
     if not record:
-        return JsonResponse({"error": f"{table_name.capitalize()} not found"}, status=404)
+        return JsonResponse({
+            "code": 404,
+            "message": f"{table_name.capitalize()} not found",
+            "description": "",
+            "errors": ["Record not found"],
+            "payload": None
+        }, status=404, json_dumps_params={"ensure_ascii": False})
+    
     data = fix_mojibake(record)
-    return JsonResponse(data, safe=False, json_dumps_params={"ensure_ascii": False})
+    
+    # Add related comments (for news and charamam)
+    if table_name in ["newsmalayalam", "charamam"]:
+        data["comments"] = get_comments_for_record(record_id, table_name)
+
+    return JsonResponse({
+        "code": 200,
+        "message": "Fetched Successfully",
+        "description": "",
+        "errors": [],
+        "payload": data
+    }, safe=False, json_dumps_params={"ensure_ascii": False})
 
 
 def get_news_by_id_views(request, news_id):
@@ -197,6 +237,7 @@ def restore_news_view(request, news_id):
 
 
 # -------- Add / Edit news --------
+@jwt_required
 @csrf_exempt
 def add_news_view(request):
     if request.method != "POST":
@@ -205,19 +246,19 @@ def add_news_view(request):
     if request.method == "POST":
         # Collect fields
         newsType = request.POST.get("newsType")
-        newsHde = request.POST.get("heading")
+        newsHde = request.POST.get("newsHde")
         news = request.POST.get("news")
         images2 = request.POST.get("images2", "")
         name = request.POST.get("byline")
         news2 = request.POST.get("content", "")
         images = request.POST.get("images", "")
         fdfNte = request.POST.get("fdfNte", "")
-        language = request.POST.get("language", "ml")
+        language = request.POST.get("language")
         top = request.POST.get("top", 0)
         slider = request.POST.get("slider", 0)
         imgVisibility = request.POST.get("imgVisibility")
         status_cur = request.POST.get("status_cur", 0)
-        status_mge = request.POST.get("status_mge")
+        status_mge = user_id = getattr(request, "user_id", None)
         copy = request.POST.get("copy")
         copyid = request.POST.get("copyid")
         writer = request.POST.get("writer")
@@ -283,8 +324,18 @@ def add_news_view(request):
                     disable_comments, paid, cdn,  scheduled_at,  content_type, video_type, video_url,
                 ],
             )
+        last_id = cursor.lastrowid
 
-        return JsonResponse({"message": "News added successfully"})
+        # Fetch the newly inserted record
+        cursor.execute("SELECT * FROM newsmalayalam WHERE id = %s", [last_id])
+        row = cursor.fetchone()
+        columns = [col[0] for col in cursor.description]
+        new_record = dict(zip(columns, row))
+
+        return JsonResponse({
+                            "message": "News added successfully",
+                            "data": new_record
+                                }, json_dumps_params={"ensure_ascii": False})
     return JsonResponse({"error": "Method not allowed"}, status=405)
 
 
@@ -314,7 +365,7 @@ def edit_news_view(request, news_id):
             "newsHde": request.POST.get("heading"),
             "news": request.POST.get("news"),
             "images2": request.POST.get("images2", ""),
-            "name": request.POST.get("byline"),
+            "name": request.POST.get("name"),
             "news2": request.POST.get("content", ""),
             "images": request.POST.get("images", ""),
             "fdfNte": request.POST.get("fdfNte", ""),
@@ -324,7 +375,7 @@ def edit_news_view(request, news_id):
             "upddate": date_now,
             "imgVisibility": request.POST.get("imgVisibility"),
             "status_cur": request.POST.get("status_cur", 0),
-            "status_mge": request.POST.get("status_mge"),
+            "status_mge": getattr(request, "user_id", None),
             "copy": request.POST.get("copy"),
             "copyid": request.POST.get("copyid"),
             "writer": request.POST.get("writer"),
@@ -417,15 +468,6 @@ def get_slider_data_views(request):
         return JsonResponse({"error": "No slider data found"}, status=404)
     return JsonResponse(data, safe=False)
 
-
-@csrf_exempt
-def update_slider_view(request, slider_id, news_id):
-    success, message = update_slider_with_news(slider_id, news_id)
-    return JsonResponse(
-        {"success": success, "message": message}, status=200 if success else 400
-    )
-
-
 @csrf_exempt
 def remove_from_slider_view(request, slider_id):
     if request.method != "DELETE":
@@ -436,11 +478,25 @@ def remove_from_slider_view(request, slider_id):
         status=200,
     )
 
+@csrf_exempt
+def update_slider_view(request, slider_id, news_id):
+    if request.method != "PATCH":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+    success, message = update_slider_with_news(slider_id, news_id)
+    return JsonResponse(
+        {
+            "success": success, 
+            "message": message,
+            "Slider position": slider_id-1,
+            "News_ID": news_id
+            }, status=200 if success else 400
+    )
+
 
 # -------- Move / Copy news --------
 @csrf_exempt
 def move_news_to_newsType_view(request, news_id, newsType):
-    if request.method != "POST":
+    if request.method != "PATCH":
         return JsonResponse({"error": "Method not allowed"}, status=405)
     moved = move_news_to_otherType(news_id, newsType)
     if moved:
@@ -452,7 +508,7 @@ def move_news_to_newsType_view(request, news_id, newsType):
 
 @csrf_exempt
 def copy_news_view(request, news_id, newsType):
-    if request.method != "POST":
+    if request.method != "PATCH":
         return JsonResponse({"error": "Method not allowed"}, status=405)
     new_id = copy_news_records(news_id, newsType)
     if not new_id:
@@ -475,7 +531,7 @@ def get_today_post_count(request):
         count = cursor.fetchone()[0]
     return JsonResponse({"today_post_count": count})
 
-
+@jwt_required
 def mark_as_posted_view(request, news_id, account_id):
     updated_post = mark_post_as_posted(news_id, account_id, request)
     if not updated_post:
@@ -585,6 +641,62 @@ def unblock_ip_views(request, ip_id):
         "ip_address_id": ip_id
         }
     )
+    
+def search_with_ipaddress(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Only POST method is allowed"}, status=405)
+    
+    search_ip = request.GET.get("blocked-ip")
+    if not search_ip:
+        return JsonResponse({"error": "IP is required"}, status=400)
+    
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT id, `blocked-ip`, ip_date FROM ip_address WHERE `blocked-ip` = %s", [search_ip])
+        rows = cursor.fetchall()
+        columns = [col[0] for col in cursor.description]
+        results = [dict(zip(columns, row)) for row in rows]
+    
+    return JsonResponse({
+        "code": 200,
+        "message": "Fetch Successfully",
+        "results": results
+    })
+    
+@csrf_exempt
+def search_and_block(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Only POST method is allowed"}, status=405)
+    
+    search_ip = request.POST.get("ip")  # Now reading from POST body
+    if not search_ip:
+        return JsonResponse({"error": "IP is required"}, status=400)
+
+    with connection.cursor() as cursor:
+        # 1. Check if IP exists in cmd2
+        cursor.execute("SELECT id, ip FROM cmd2 WHERE ip = %s", [search_ip])
+        row = cursor.fetchone()
+        if not row:
+            return JsonResponse({"message": "IP not found in cmd2"}, status=404)
+
+        # 2. Check if already blocked
+        cursor.execute("SELECT id FROM ip_address WHERE `blocked-ip` = %s", [search_ip])
+        already_blocked = cursor.fetchone()
+        if already_blocked:
+            return JsonResponse({"message": "IP already blocked"}, status=200)
+
+        # 3. Insert into ip_address
+        ip_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        cursor.execute(
+            "INSERT INTO ip_address (`blocked-ip`, ip_date) VALUES (%s, %s)",
+            [search_ip, ip_date]
+        )
+
+    return JsonResponse({
+        "message": "IP blocked successfully",
+        "blocked_ip": search_ip,
+        "blocked_at": ip_date
+    })
+    
 
 # ------------Writers------------
 # add writer
@@ -621,7 +733,7 @@ def edit_writer_view(request, writer_id):
             writer_data = dict(zip(columns, row))
         return JsonResponse(writer_data, json_dumps_params={"ensure_ascii": False}, safe=False)
     
-    elif request.method == "POST":
+    elif request.method == "PATCH":
         nme = request.POST.get("nme")
         date = now().strftime("%Y-%m-%d %H:%M:%S")
         if not nme:
@@ -651,3 +763,4 @@ def delete_writer_view(request, writer_id):
             "writer_id": writer_id,
         }
     )
+    

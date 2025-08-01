@@ -24,7 +24,7 @@ def fetch_paginated_data(query, params, page, page_size, request):
     return total_records, results, base_url
 
 # Build pagination structure
-def build_pagination(base_url, page, page_size, total_records, window=5, edge=2):
+def build_pagination(base_url, page, page_size, total_records, window=3, edge=2):
     """
     Build pagination with leading/trailing pages and ellipsis (…).
     window = number of pages around current
@@ -35,7 +35,8 @@ def build_pagination(base_url, page, page_size, total_records, window=5, edge=2)
         total_pages = 1
 
     def build_url(p):
-        return f"{base_url}?{urlencode({'page': p, 'page_size': page_size})}"
+        return f"{base_url}?{urlencode({'page[number]': p, 'page[size]': page_size})}"
+        # return f"{base_url}?(urelencode({page[number]={p}&page[size]={page_size}}))"
 
     # Pages near the current page
     start_page = max(1, page - window)
@@ -70,3 +71,4 @@ def build_pagination(base_url, page, page_size, total_records, window=5, edge=2)
         "next_page": build_url(page + 1) if page < total_pages else None,
         "last_page": build_url(total_pages) if page < total_pages else None,
     }
+    

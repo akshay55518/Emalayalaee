@@ -3,6 +3,8 @@ from datetime import datetime
 from .utils import fix_mojibake
 from .pagination import build_pagination, fetch_paginated_data
 from .record_utils import add_full_urls
+from .login_authetication import *
+from django.http import JsonResponse
 
 # Get data from a specific table
 def get_paginated_table_data(table_name, page=1, page_size=10, request=None, order_by='date', fix_encoding=True):
@@ -11,36 +13,66 @@ def get_paginated_table_data(table_name, page=1, page_size=10, request=None, ord
         cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
         total_records = cursor.fetchone()[0]
 
-    # If records <= 100 → fetch all without pagination
+    # If records <= 500 → fetch all without pagination
     if total_records <= 500:
         with connection.cursor() as cursor:
             cursor.execute(f"SELECT * FROM {table_name} ORDER BY {order_by} DESC")
             rows = cursor.fetchall()
             columns = [col[0] for col in cursor.description]
             results = [dict(zip(columns, row)) for row in rows]
-        results = [add_full_urls(row, table_name) for row in results]
-        if fix_encoding:
-            results = fix_mojibake(results)
-        return {
-            'total_records': total_records,
-            'results': results
-        }
+    else:
+        # Paginated fetch
+        query = f"SELECT * FROM {table_name} ORDER BY {order_by} DESC"
+        total_records, results, base_url = fetch_paginated_data(query, [], page, page_size, request)
 
-    # Else → paginated fetch
-    query = f"SELECT * FROM {table_name} ORDER BY {order_by} DESC"
-    total_records, results, base_url = fetch_paginated_data(query, [], page, page_size, request)
+    # If table is newsmalayalam → add editor username
+    if table_name == "newsmalayalam":
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT AdminId, Username FROM admin1")
+            admin_map = {row[0]: row[1] for row in cursor.fetchall()}  # AdminId → Username
+        for record in results:
+            record["editor_username"] = admin_map.get(record.get("status_mge"))  # Add username
+
+    # Add full URLs
     results = [add_full_urls(row, table_name) for row in results]
     if fix_encoding:
         results = fix_mojibake(results)
 
-    return {
-        'total_records': total_records,
-        'page': page,
-        'page_size': page_size,
-        'results': results,
-        **build_pagination(base_url, page, page_size, total_records)
+    # Return response
+    if total_records <= 500:
+        return {
+            "code": 200,
+            "message": "Fetch Successfully",
+            "description": "",
+            "errors": [],
+            "total_records": total_records,
+            "page": 1,
+            "page_size": total_records,
+            "results": results,  # <-- keep the same key
+            "pagination": {      # <-- add a dummy pagination structure
+                "links": {},
+                "pages": [],
+                "meta": {
+                    "current_page": 1,
+                    "total_pages": 1,
+                    "page_size": total_records,
+                    "total_records": total_records
+                }
+        }
     }
-
+    return {
+        "code": 200,
+        "message": "Fetch Successfully",
+        "description": "",
+        "errors": [],
+        "total_records": total_records,
+        "page": page,
+        "page_size": page_size,
+        "results": results,
+        **build_pagination(base_url, page, page_size, total_records),
+    }
+    
+    
 # Get record by ID
 def get_record_by_id(table_name, record_id, field_map=None):
     with connection.cursor() as cursor:
@@ -224,15 +256,16 @@ def copy_news_records(news_id, newsType):
         news_data['copyid'] = news_id
         news_data['date'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         news_data['upddate'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        del news_data['id'] # Remove ID to insert as new record
+        # Remove primary key
+        if 'id' in news_data:
+            del news_data['id']
 
         # Build dynamic insert
-        keys = ", ".join(news_data.keys())
+        keys = ", ".join(f"`{k}`" for k in news_data.keys())
         placeholders = ", ".join(["%s"] * len(news_data))
         values = list(news_data.values())
 
         cursor.execute(f"INSERT INTO newsmalayalam ({keys}) VALUES ({placeholders})", values)
-
         return cursor.lastrowid
     
     
@@ -240,10 +273,26 @@ def copy_news_records(news_id, newsType):
     
     # mark as posted in social media
 def mark_post_as_posted(news_id, account_id, request):
-    """Mark a social media post as posted by the logged-in user and return the updated row."""
-    user_id = request.user.id if request.user.is_authenticated else None
-    user_id = request.user.id
+    """Mark a social media post as posted by the logged-in user. Auto-create if missing."""
+    user_id = getattr(request, "user_id", None)
+    if not user_id:
+        raise ValueError("User ID is missing. Did you forget to protect the route with @jwt_required?")
+    
     with connection.cursor() as cursor:
+        # Check if row exists
+        cursor.execute("""
+            SELECT id FROM social_media_posts 
+            WHERE news_id = %s AND account_id = %s
+        """, [news_id, account_id])
+        exists = cursor.fetchone()
+
+        if not exists:
+            # Auto-create the row
+            cursor.execute("""
+                INSERT INTO social_media_posts (news_id, account_id, status, userid, date)
+                VALUES (%s, %s, 0, %s, NOW())
+            """, [news_id, account_id, user_id])
+        
         # Update the post
         cursor.execute("""
             UPDATE social_media_posts 
@@ -261,6 +310,7 @@ def mark_post_as_posted(news_id, account_id, request):
         updated_post = dict(zip(columns, row)) if row else None
 
     return updated_post
+
 
 def get_comments_by_status(status, request):
     page = int(request.GET.get("page", 1))
@@ -291,5 +341,6 @@ def get_blocked_ips(request):
         "results": results,
         **build_pagination(base_url, page, page_size, total_records)
     }
+
 
 
