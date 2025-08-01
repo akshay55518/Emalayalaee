@@ -469,7 +469,20 @@
 		},
 		{
 			"name": "editor",
-			"item": [],
+			"item": [
+				{
+					"name": "get editors",
+					"id": "32292723-71fa51f0-51bf-49db-984f-3eb0d9aa6dd2",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			],
 			"id": "32292723-5d9f695e-3f9b-4600-bf11-63da699c2de6"
 		},
 		{
