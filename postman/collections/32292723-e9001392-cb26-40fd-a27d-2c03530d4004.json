@@ -507,7 +507,7 @@
 					"response": []
 				},
 				{
-					"name": "New Request",
+					"name": "delete editor",
 					"id": "32292723-5b1fefab-f5d5-4d82-8e69-0a46a8de27b0",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
