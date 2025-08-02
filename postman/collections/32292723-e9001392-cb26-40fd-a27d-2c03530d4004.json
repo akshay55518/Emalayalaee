@@ -522,6 +522,11 @@
 			"id": "32292723-5d9f695e-3f9b-4600-bf11-63da699c2de6"
 		},
 		{
+			"name": "New Folder",
+			"item": [],
+			"id": "32292723-02a65594-f09c-4184-9501-db5eeb7a84c5"
+		},
+		{
 			"name": "Login",
 			"id": "32292723-91f19d5d-bdca-48a3-97b2-0e12bcb0284f",
 			"protocolProfileBehavior": {
