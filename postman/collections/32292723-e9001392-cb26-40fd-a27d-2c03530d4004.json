@@ -153,6 +153,18 @@
 					"response": []
 				},
 				{
+					"name": "delete news",
+					"id": "32292723-98d7bbd2-bd55-4725-a6e9-a2c7284f19df",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
 					"name": "search by title",
 					"id": "32292723-bbc10f3b-15c4-4362-9c7b-af70fb5ea184",
 					"protocolProfileBehavior": {
@@ -198,8 +210,20 @@
 							"response": []
 						},
 						{
-							"name": "search and block",
+							"name": "search ip",
 							"id": "32292723-cad7c8ac-a16b-4d33-afcb-55d0a53e970d",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						},
+						{
+							"name": "search and block",
+							"id": "32292723-7654f32e-32ff-4282-a9a6-5f27350a08fb",
 							"protocolProfileBehavior": {
 								"disableBodyPruning": true
 							},
