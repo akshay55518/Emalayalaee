@@ -78,9 +78,9 @@ urlpatterns = [
 
     # -------------------- CHARAMAM --------------------
     # get all charamam
-    path('charamam/', views.get_charamam, name='get_charamam'),
+    path('obituaries/', views.get_charamam, name='get_charamam'),
     # get charamam with id
-    path('charamam/<int:id>/', views.get_charamam_by_id_views, name='get_charamam_by_id'),
+    path('obituaries/<int:id>/', views.get_charamam_by_id_views, name='get_charamam_by_id'),
 
     # -------------------- WRITERS --------------------
     # get all writers
@@ -101,4 +101,14 @@ urlpatterns = [
     path('post-marked-social/<int:news_id>/<int:account_id>/', views.mark_as_posted_view, name='mark_as_posted'),
     
     # path('advertise/', views.advertise, name='advertise')
+    
+    # ------------------------editors-----------------------------
+    # get all editors
+    path('editors/', views.get_editors, name='get editor'),
+    # add editors
+    path('add-editor/', views.add_editor_views, name='add-editor'),
+    # edit editors
+    path('edit-editor/<int:editor_id>', views.edit_editor_views, name='edit-editor'),
+    # delete editors
+    path('delete-editor/<int:editor_id>', views.delete_editor_views, name='delete-editor'),
 ]

@@ -1,10 +1,10 @@
 from django.db import connection
 from datetime import datetime
-from .utils import fix_mojibake
+from .language_utils import fix_mojibake
 from .pagination import build_pagination, fetch_paginated_data
 from .record_utils import add_full_urls
 from .login_authetication import *
-from django.http import JsonResponse
+
 
 # Get data from a specific table
 def get_paginated_table_data(table_name, page=1, page_size=10, request=None, order_by='date', fix_encoding=True):
@@ -311,7 +311,7 @@ def mark_post_as_posted(news_id, account_id, request):
 
     return updated_post
 
-
+# get comments 
 def get_comments_by_status(status, request):
     page = int(request.GET.get("page", 1))
     page_size = int(request.GET.get("page_size", 10))

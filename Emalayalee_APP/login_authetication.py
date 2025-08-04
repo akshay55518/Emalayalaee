@@ -18,13 +18,13 @@ class Login(APIView):
             row = cursor.fetchone()
 
         if not row:
-            return Response({"error": "Invalid credentials"}, status=401)
+            return Response({"error": "Invalid username"}, status=401)
 
         user_id, db_password = row
 
         # TODO: Use hashed password check in production
         if password != db_password:
-            return Response({"error": "Invalid credentials"}, status=401)
+            return Response({"error": "Invalid Password"}, status=401)
 
         now = datetime.utcnow()
         access_payload = {
@@ -40,7 +40,7 @@ class Login(APIView):
 
         access_token = jwt.encode(access_payload, settings.SECRET_KEY, algorithm='HS256')
         refresh_token = jwt.encode(refresh_payload, settings.SECRET_KEY, algorithm='HS256')
-
+     
         return Response({
             'access': access_token,
             'refresh': refresh_token

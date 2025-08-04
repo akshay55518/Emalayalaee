@@ -2,13 +2,14 @@ from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 from django.utils.timezone import now
 from .db_access import *
-from .utils import fix_mojibake
+from .language_utils import fix_mojibake
 from .login_authetication import jwt_required
 from .db_access import mark_post_as_posted
 from django.http import JsonResponse
+import json
 
 # -------- Helper for pagination ----------
-def get_paginated_list(request, table_name, order_by="id"):
+def get_paginated_list(request, table_name, order_by):
     page = int(request.GET.get("page[number]", request.GET.get("page", 1)))
     page_size = int(request.GET.get("page[size]", request.GET.get("page_size", 15)))
     data = get_paginated_table_data(
@@ -241,7 +242,7 @@ def add_news_view(request):
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
 
-    if request.method == "POST":
+    try:
         # Collect fields
         newsType = request.POST.get("newsType")
         newsHde = request.POST.get("newsHde")
@@ -256,7 +257,7 @@ def add_news_view(request):
         slider = request.POST.get("slider", 0)
         imgVisibility = request.POST.get("imgVisibility")
         status_cur = request.POST.get("status_cur", 0)
-        status_mge = user_id = getattr(request, "user_id", None)
+        status_mge = getattr(request, "user_id", None)
         copy = request.POST.get("copy")
         copyid = request.POST.get("copyid")
         writer = request.POST.get("writer")
@@ -290,53 +291,57 @@ def add_news_view(request):
                 for chunk in file.chunks():
                     destination.write(chunk)
             image_paths.append(file_path)
-
-        # Dates
+        
+        images = "@*@".join(image_paths)
+        
         date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # Insert
+        # Insert & fetch in same cursor block
         with connection.cursor() as cursor:
             cursor.execute(
                 """
                 INSERT INTO newsmalayalam (
-                    `newsType`, `newsHde`, `news`, `images2`, `name`, `news2`,
-                    `images`, `pdf`, `fdfNte`, `language`, `date`, `top`, `slider`,
-                    `upddate`, `imgVisibility`, `status_cur`, `status_mge`, `copy`,
-                    `copyid`, `writer`, `facebook_pubstatus`, `fbprofile_pubstatus`,
-                    `fbprofile2_pubstatus`, `tag`, `thumbimage`, `disable_comments`,
-                    `paid`, `cdn`, `scheduled_at`, `content_type`, `video_type`, `video_url`
+                    newsType, newsHde, news, images2, name, news2, images, pdf,
+                    fdfNte, language, date, top, slider, upddate, imgVisibility,
+                    status_cur, status_mge, copy, copyid, writer,
+                    facebook_pubstatus, fbprofile_pubstatus, fbprofile2_pubstatus,
+                    tag, thumbimage, disable_comments, paid, cdn, scheduled_at,
+                    content_type, video_type, video_url
                 ) VALUES (
-                    %s, %s, %s, %s, %s, %s,
+                    %s, %s, %s, %s, %s, %s, %s, %s,
                     %s, %s, %s, %s, %s, %s, %s,
                     %s, %s, %s, %s, %s,
-                    %s, %s, %s, %s,
                     %s, %s, %s,
-                    %s, %s, %s,
-                    %s, %s, %s, %s
+                    %s, %s, %s, %s, %s, %s,
+                    %s, %s, %s
                 )
-            """,
+                """,
                 [
-                    newsType, newsHde, news, images2, name, news2, ",".join(image_paths), pdf_path, fdfNte, 
-                    language, date, top, slider, date, imgVisibility, status_cur, status_mge, copy, copyid, 
-                    writer, facebook_pubstatus, fbprofile_pubstatus, fbprofile2_pubstatus, tag, thumbimage, 
-                    disable_comments, paid, cdn,  scheduled_at,  content_type, video_type, video_url,
+                    newsType, newsHde, news, images2, name, news2, ",".join(image_paths), pdf_path,
+                    fdfNte, language, date, top, slider, date, imgVisibility, status_cur,
+                    status_mge, copy, copyid, writer, facebook_pubstatus,
+                    fbprofile_pubstatus, fbprofile2_pubstatus, tag, thumbimage,
+                    disable_comments, paid, cdn, scheduled_at, content_type, video_type, video_url
                 ],
             )
-        last_id = cursor.lastrowid
+            last_id = cursor.lastrowid
 
-        # Fetch the newly inserted record
-        cursor.execute("SELECT * FROM newsmalayalam WHERE id = %s", [last_id])
-        row = cursor.fetchone()
-        columns = [col[0] for col in cursor.description]
-        new_record = dict(zip(columns, row))
+            # Fetch inserted record immediately
+            cursor.execute("SELECT * FROM newsmalayalam WHERE id = %s", [last_id])
+            row = cursor.fetchone()
+            columns = [col[0] for col in cursor.description]
+            new_record = dict(zip(columns, row))
 
         return JsonResponse({
-                            "message": "News added successfully",
-                            "data": new_record
-                                }, json_dumps_params={"ensure_ascii": False})
-    return JsonResponse({"error": "Method not allowed"}, status=405)
+            "message": "News added successfully",
+            "data": new_record
+        }, json_dumps_params={"ensure_ascii": False})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
 
+@jwt_required
 @csrf_exempt
 def edit_news_view(request, news_id):
     if request.method == "GET":
@@ -434,7 +439,7 @@ def edit_news_view(request, news_id):
 
 
 # -------- Search news --------
-def search_news_by_title_views(request, title):
+def     search_news_by_title_views(request, title):
     if not title:
         return JsonResponse({"error": "Title parameter is required"}, status=400)
     page = int(request.GET.get("page", 1))
@@ -460,6 +465,7 @@ def search_news_by_title_views(request, title):
 
 
 # -------- Slider --------
+
 def get_slider_data_views(request):
     data = get_slider_data()
     if not data:
@@ -527,7 +533,7 @@ def get_today_post_count(request):
             [today],
         )
         count = cursor.fetchone()[0]
-    return JsonResponse({"today_post_count": count})
+    return JsonResponse({"today_social_post_count": count})
 
 @jwt_required
 def mark_as_posted_view(request, news_id, account_id):
@@ -762,3 +768,116 @@ def delete_writer_view(request, writer_id):
         }
     )
     
+
+
+# ------------------Editor-----------------------
+#get all editors
+def get_editors(request):
+    return get_paginated_list(request, "admin1", order_by="AdminId")
+
+# add editor
+@csrf_exempt
+def add_editor_views(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+
+    try:
+        # Support both JSON body and query params
+        if request.content_type == "application/json":
+            data = json.loads(request.body)
+        else:
+            data = request.POST or request.GET  # Fallback to form/query params
+
+        username = data.get("username")
+        password = data.get("password")
+        admin_type = data.get("adminType")
+
+        if not username or not password or not admin_type:
+            return JsonResponse({"error": "All fields are required"}, status=400)
+
+        if int(admin_type) not in [1, 2, 3, 4]:
+            return JsonResponse({"error": "Invalid adminType"}, status=400)
+
+        date_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO admin1 (Username, Password, adminType, date, updDate)
+                VALUES (%s, %s, %s, %s, %s)
+                """,
+                [username, password, admin_type, date_now, date_now],
+            )
+
+        return JsonResponse({
+            "message": "Editor added successfully",
+            "editor": {
+                "username": username,
+                "adminType": admin_type,
+                "created_at": date_now
+            }
+        }, status=201)
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+    
+# edit writer
+@csrf_exempt
+def edit_editor_views(request, editor_id):
+    if request.method == "GET":
+        # Fetch editor details
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT AdminId, Username, adminType, date, updDate FROM admin1 WHERE AdminId=%s", [editor_id])
+            row = cursor.fetchone()
+            if not row:
+                return JsonResponse({"error": "Editor not found"}, status=404)
+            columns = [col[0] for col in cursor.description]
+            return JsonResponse(dict(zip(columns, row)))
+
+    elif request.method == "POST":
+        # Update editor
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        admin_type = request.POST.get("adminType")
+
+        if not (username or password or admin_type):
+            return JsonResponse({"error": "No fields to update"}, status=400)
+
+        updates, values = [], []
+        if username:
+            updates.append("Username=%s")
+            values.append(username)
+        if password:
+            updates.append("Password=%s")
+            values.append(password)
+        if admin_type:
+            updates.append("adminType=%s")
+            values.append(admin_type)
+
+        updates.append("updDate=%s")
+        values.append(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        values.append(editor_id)
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(f"UPDATE admin1 SET {', '.join(updates)} WHERE AdminId=%s", values)
+            return JsonResponse({"message": "Editor updated successfully"})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    else:
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+    
+# delete editor
+def delete_editor_views(request, editor_id):
+    if request.method != "DELETE":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+
+
+    with connection.cursor() as cursor:
+        cursor.execute("DELETE FROM admin1 WHERE AdminId = %s", [editor_id])
+        if cursor.rowcount == 0:
+            return JsonResponse({"error": "Editor not found"}, status=404)
+    return JsonResponse({
+        "message": "Editor deleted successfully",
+        "editor_id": editor_id})
