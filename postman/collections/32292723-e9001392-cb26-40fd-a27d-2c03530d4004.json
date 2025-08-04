@@ -525,7 +525,7 @@
 			"name": "advertisement",
 			"item": [
 				{
-					"name": "New Request",
+					"name": "advertise",
 					"id": "32292723-306ce3a3-bb25-4e58-a92e-5ce504a77f1a",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
