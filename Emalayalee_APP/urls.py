@@ -103,12 +103,12 @@ urlpatterns = [
     # path('advertise/', views.advertise, name='advertise')
     
     # ------------------------editors-----------------------------
-    # get all editors
-    path('editors/', views.get_editors, name='get editor'),
-    # add editors
-    path('add-editor/', views.add_editor_views, name='add-editor'),
-    # edit editors
-    path('edit-editor/<int:editor_id>', views.edit_editor_views, name='edit-editor'),
-    # delete editors
-    path('delete-editor/<int:editor_id>', views.delete_editor_views, name='delete-editor'),
+    # # get all editors
+    # path('editors/', views.get_editors, name='get editor'),
+    # # add editors
+    # path('add-editor/', views.add_editor_views, name='add-editor'),
+    # # edit editors
+    # path('edit-editor/<int:editor_id>', views.edit_editor_views, name='edit-editor'),
+    # # delete editors
+    # path('delete-editor/<int:editor_id>', views.delete_editor_views, name='delete-editor'),
 ]

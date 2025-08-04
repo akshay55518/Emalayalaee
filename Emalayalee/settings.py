@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'Emalayalee_APP',
+    'advertisement',
     'rest_framework'
 ]
 REST_FRAMEWORK = {
