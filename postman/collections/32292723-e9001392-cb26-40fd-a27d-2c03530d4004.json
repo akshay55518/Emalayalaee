@@ -537,7 +537,7 @@
 					"response": []
 				},
 				{
-					"name": "New Request",
+					"name": "visitor",
 					"id": "32292723-cfa3ae53-7ade-44cf-872f-c33bc5d8f958",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
