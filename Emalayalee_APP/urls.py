@@ -2,7 +2,6 @@ from django.urls import path
 from .login_authetication import *
 from . import views
 
-
 urlpatterns = [
 
     path('api-login/', views.Login.as_view(), name="login"),
@@ -17,7 +16,7 @@ urlpatterns = [
     # Edit news
     path("edit-news/<int:news_id>/", views.edit_news_view, name="edit_news"),
     # Search news by title
-    path('search-news/<str:title>/', views.search_news_by_title_views, name='search_news_by_title'),
+    path('search-news/<str:title>/', views.search_news_views, name='search_news_by_title'),
 
     # -------------------- NEWS TYPES --------------------
     # Get all news types
@@ -90,7 +89,7 @@ urlpatterns = [
     # add writers
     path('add-writer/', views.add_writer_view, name='add_writer'),
     # edit editors
-    path('edit-writer/<int:writer_id>', views.edit_writer_view, name='edit_writer'),
+    path('edit-writer/<int:writer_id>/', views.edit_writer_view, name='edit_writer'),
     # delete writer
     path('delete-writer/<int:writer_id>/', views.delete_writer_view, name='delete_writer'),
 
@@ -103,12 +102,12 @@ urlpatterns = [
     # path('advertise/', views.advertise, name='advertise')
     
     # ------------------------editors-----------------------------
-    # # get all editors
-    # path('editors/', views.get_editors, name='get editor'),
-    # # add editors
-    # path('add-editor/', views.add_editor_views, name='add-editor'),
-    # # edit editors
-    # path('edit-editor/<int:editor_id>', views.edit_editor_views, name='edit-editor'),
-    # # delete editors
-    # path('delete-editor/<int:editor_id>', views.delete_editor_views, name='delete-editor'),
+    # get all editors
+    path('editors/', views.get_editors, name='get editor'),
+    # add editors
+    path('add-editor/', views.add_editor_views, name='add-editor'),
+    # edit editors
+    path('edit-editor/<int:editor_id>', views.edit_editor_views, name='edit-editor'),
+    # delete editors
+    path('delete-editor/<int:editor_id>', views.delete_editor_views, name='delete-editor'),
 ]

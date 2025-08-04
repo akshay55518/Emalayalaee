@@ -28,21 +28,22 @@ def get_news(request):
         raise ValueError("User ID is missing. Did you forget to protect the route with @jwt_required?")
     return get_paginated_list(request, "newsmalayalam", order_by="id")
 
-
+@jwt_required
 def get_comments(request):
     return get_paginated_list(request, "cmd2", order_by="id")
 
-
+@jwt_required
 def get_charamam(request):
     return get_paginated_list(request, "charamam", order_by="id")
 
-
+@jwt_required
 def get_writers(request):
     return get_paginated_list(request, "writers", order_by="id")
 
 # def advertise(request):
 #     return get_paginated_list(request, "advertisement_new", order_by="id")
 
+@jwt_required
 def get_comments_for_record(record_id, table_name):
     with connection.cursor() as cursor:
         cursor.execute(
@@ -57,6 +58,7 @@ def get_comments_for_record(record_id, table_name):
 
 
 # -------- Fetch data by ID --------
+@jwt_required
 def get_record_by_id_view(request, table_name, record_id, field_map=None):
     record = get_record_by_id(table_name, record_id, field_map)
     if not record:
@@ -82,7 +84,7 @@ def get_record_by_id_view(request, table_name, record_id, field_map=None):
         "payload": data
     }, safe=False, json_dumps_params={"ensure_ascii": False})
 
-
+@jwt_required
 def get_news_by_id_views(request, news_id):
     return get_record_by_id_view(
         request,
@@ -99,7 +101,7 @@ def get_news_by_id_views(request, news_id):
         },
     )
 
-
+@jwt_required
 def get_comments_by_id_views(request, id):
     return get_record_by_id_view(
         request,
@@ -118,7 +120,7 @@ def get_comments_by_id_views(request, id):
         },
     )
 
-
+@jwt_required
 def get_charamam_by_id_views(request, id):
     return get_record_by_id_view(
         request,
@@ -134,7 +136,7 @@ def get_charamam_by_id_views(request, id):
         },
     )
 
-
+@jwt_required
 def get_writers_by_id_views(request, id):
     return get_record_by_id_view(
         request,
@@ -150,6 +152,7 @@ def get_writers_by_id_views(request, id):
 
 
 # -------- News types --------
+@jwt_required
 def get_news_types_views(request):
     news_types = get_news_types()
     if not news_types:
@@ -160,6 +163,7 @@ def get_news_types_views(request):
 
 
 # -------- News by type --------
+@jwt_required
 def get_news_by_type_views(request, news_type):
     data = get_news_by_type(news_type, request)
     if not data["results"]:
@@ -171,6 +175,7 @@ def get_news_by_type_views(request, news_type):
 
 
 # -------- News by type & status --------
+@jwt_required
 def get_news_by_type_and_status_views(request, news_type, status_cur):
     data = get_news_by_type_and_status(news_type, status_cur, request)
     if not data["results"]:
@@ -180,6 +185,7 @@ def get_news_by_type_and_status_views(request, news_type, status_cur):
 
 
 # -------- Publish / Delete / Restore / Permanent delete --------
+@jwt_required
 @csrf_exempt
 def publish_news_view(request, news_id):
     if request.method != "POST":
@@ -194,6 +200,7 @@ def publish_news_view(request, news_id):
 
 
 @csrf_exempt
+@jwt_required
 def delete_news_view(request, news_id):
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
@@ -207,6 +214,7 @@ def delete_news_view(request, news_id):
 
 
 @csrf_exempt
+@jwt_required
 def permanently_delete_news_view(request, news_id):
     if request.method != "DELETE":
         return JsonResponse({"error": "Method not allowed"}, status=405)
@@ -223,6 +231,7 @@ def permanently_delete_news_view(request, news_id):
 
 
 @csrf_exempt
+@jwt_required
 def restore_news_view(request, news_id):
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
@@ -340,7 +349,7 @@ def add_news_view(request):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
 
-
+# edit news
 @jwt_required
 @csrf_exempt
 def edit_news_view(request, news_id):
@@ -439,18 +448,41 @@ def edit_news_view(request, news_id):
 
 
 # -------- Search news --------
-def     search_news_by_title_views(request, title):
+@jwt_required
+def search_news_views(request, title):
     if not title:
         return JsonResponse({"error": "Title parameter is required"}, status=400)
+
+    # If title is numeric, fetch by ID (fast, no pagination)
+    if title.isdigit():
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM newsmalayalam WHERE id = %s", [int(title)])
+            row = cursor.fetchone()
+            if not row:
+                return JsonResponse({"error": "No news found"}, status=404)
+            columns = [col[0] for col in cursor.description]
+            result = dict(zip(columns, row))
+        result = fix_mojibake([result])[0]
+        return JsonResponse(
+            {"result": result}, 
+            json_dumps_params={"ensure_ascii": False}, 
+            status=200
+        )
+
+    # If not numeric, perform text search with pagination
     page = int(request.GET.get("page", 1))
     page_size = int(request.GET.get("page_size", 10))
     query = "SELECT * FROM newsmalayalam WHERE newsHde LIKE %s OR news LIKE %s ORDER BY date DESC"
     search_term = f"%{title}%"
+    params = [search_term, search_term]
+
     total_records, results, base_url = fetch_paginated_data(
-        query, [search_term, search_term], page, page_size, request
+        query, params, page, page_size, request
     )
+
     if not results:
         return JsonResponse({"error": "No news found"}, status=404)
+
     results = fix_mojibake(results)
     return JsonResponse(
         {
@@ -465,14 +497,18 @@ def     search_news_by_title_views(request, title):
 
 
 # -------- Slider --------
-
+# show slider data
+@jwt_required
 def get_slider_data_views(request):
     data = get_slider_data()
     if not data:
         return JsonResponse({"error": "No slider data found"}, status=404)
     return JsonResponse(data, safe=False)
 
+
+# remove slider
 @csrf_exempt
+@jwt_required
 def remove_from_slider_view(request, slider_id):
     if request.method != "DELETE":
         return JsonResponse({"error": "Method not allowed"}, status=405)
@@ -481,17 +517,20 @@ def remove_from_slider_view(request, slider_id):
         {"message": "Slider entry removed successfully", "slider_id": slider_id},
         status=200,
     )
-
+    
+    
+# update slider
 @csrf_exempt
+@jwt_required
 def update_slider_view(request, slider_id, news_id):
-    if request.method != "PATCH":
+    if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
     success, message = update_slider_with_news(slider_id, news_id)
     return JsonResponse(
         {
             "success": success, 
             "message": message,
-            "Slider position": slider_id-1,
+            "Slider position": slider_id+1,
             "News_ID": news_id
             }, status=200 if success else 400
     )
@@ -499,6 +538,7 @@ def update_slider_view(request, slider_id, news_id):
 
 # -------- Move / Copy news --------
 @csrf_exempt
+@jwt_required
 def move_news_to_newsType_view(request, news_id, newsType):
     if request.method != "PATCH":
         return JsonResponse({"error": "Method not allowed"}, status=405)
@@ -511,6 +551,7 @@ def move_news_to_newsType_view(request, news_id, newsType):
 
 
 @csrf_exempt
+@jwt_required
 def copy_news_view(request, news_id, newsType):
     if request.method != "PATCH":
         return JsonResponse({"error": "Method not allowed"}, status=405)
@@ -525,6 +566,7 @@ def copy_news_view(request, news_id, newsType):
     )
 
 # -------- Social Media --------
+@jwt_required
 def get_today_post_count(request):
     today = now().strftime("%Y-%m-%d")
     with connection.cursor() as cursor:
@@ -545,6 +587,7 @@ def mark_as_posted_view(request, news_id, account_id):
 
 # -------- comments --------
 # view all comments with pagination
+@jwt_required
 def get_comments_by_status_views(request, status):
     data = get_comments_by_status(status, request)
     if not data["results"]:
@@ -554,6 +597,7 @@ def get_comments_by_status_views(request, status):
 
 #approve comments
 @csrf_exempt
+@jwt_required
 def approve_comments(request, comment_id):
     with connection.cursor() as cursor:
         cursor.execute("UPDATE cmd2 SET status = 1 WHERE id = %s", [comment_id])
@@ -568,6 +612,7 @@ def approve_comments(request, comment_id):
 
 # unapprove comments
 @csrf_exempt
+@jwt_required
 def unapprove_comments(request, comment_id):
     with connection.cursor() as cursor:
         cursor.execute("UPDATE cmd2 SET status = 2 WHERE id = %s", [comment_id])
@@ -582,6 +627,7 @@ def unapprove_comments(request, comment_id):
 
 #block ip address
 @csrf_exempt
+@jwt_required
 def block_ip_from_comment(request, comment_id):
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
@@ -611,6 +657,7 @@ def block_ip_from_comment(request, comment_id):
     })
 
 # delete comment
+@jwt_required
 def delete_comments(request, comment_id):
     with connection.cursor() as cursor:
         cursor.execute("DELETE FROM cmd2 WHERE id = %s", [comment_id])
@@ -625,6 +672,7 @@ def delete_comments(request, comment_id):
 
 # -------- Blocked IPs --------
 # ip address view
+@jwt_required
 def get_blocked_ips_views(request):
     data = get_blocked_ips(request)
     if not data["results"]:
@@ -633,6 +681,7 @@ def get_blocked_ips_views(request):
 
 # unblock IP address
 @csrf_exempt
+@jwt_required
 def unblock_ip_views(request, ip_id):
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
@@ -646,20 +695,25 @@ def unblock_ip_views(request, ip_id):
         }
     )
     
+@csrf_exempt
+@jwt_required
 def search_with_ipaddress(request):
-    if request.method != "POST":
-        return JsonResponse({"error": "Only POST method is allowed"}, status=405)
-    
-    search_ip = request.GET.get("blocked-ip")
+    if request.method != "GET":  # Use GET to easily test in browser or Postman
+        return JsonResponse({"error": "Only GET method is allowed"}, status=405)
+
+    search_ip = request.GET.get("blocked_ip")  # ?blocked_ip=1.2.3.4
     if not search_ip:
         return JsonResponse({"error": "IP is required"}, status=400)
-    
+
     with connection.cursor() as cursor:
-        cursor.execute("SELECT id, `blocked-ip`, ip_date FROM ip_address WHERE `blocked-ip` = %s", [search_ip])
+        cursor.execute(
+            "SELECT id, `blocked-ip` AS blocked_ip, ip_date FROM ip_address WHERE `blocked-ip` = %s",
+            [search_ip]
+        )
         rows = cursor.fetchall()
         columns = [col[0] for col in cursor.description]
         results = [dict(zip(columns, row)) for row in rows]
-    
+
     return JsonResponse({
         "code": 200,
         "message": "Fetch Successfully",
@@ -667,20 +721,21 @@ def search_with_ipaddress(request):
     })
     
 @csrf_exempt
+@jwt_required
 def search_and_block(request):
     if request.method != "POST":
         return JsonResponse({"error": "Only POST method is allowed"}, status=405)
     
-    search_ip = request.POST.get("ip")  # Now reading from POST body
+    search_ip = request.POST.get("blocked_ip")  # Reading from POST
     if not search_ip:
         return JsonResponse({"error": "IP is required"}, status=400)
 
     with connection.cursor() as cursor:
         # 1. Check if IP exists in cmd2
-        cursor.execute("SELECT id, ip FROM cmd2 WHERE ip = %s", [search_ip])
+        cursor.execute("SELECT id, ip_address FROM cmd2 WHERE ip_address = %s", [search_ip])
         row = cursor.fetchone()
         if not row:
-            return JsonResponse({"message": "IP not found in cmd2"}, status=404)
+            return JsonResponse({"message": "IP not found"}, status=404)
 
         # 2. Check if already blocked
         cursor.execute("SELECT id FROM ip_address WHERE `blocked-ip` = %s", [search_ip])
@@ -705,6 +760,7 @@ def search_and_block(request):
 # ------------Writers------------
 # add writer
 @csrf_exempt
+@jwt_required
 def add_writer_view(request):
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
@@ -726,35 +782,39 @@ def add_writer_view(request):
     
 # edit writer
 @csrf_exempt
+@jwt_required
 def edit_writer_view(request, writer_id):
     if request.method == 'GET':
         with connection.cursor() as cursor:
             cursor.execute("SELECT * FROM writers WHERE id = %s", [writer_id])
             row = cursor.fetchone()
             if not row:
-                return JsonResponse({"error":"Writer not found"},status=404)
+                return JsonResponse({"error": "Writer not found"}, status=404)
             columns = [col[0] for col in cursor.description]
             writer_data = dict(zip(columns, row))
         return JsonResponse(writer_data, json_dumps_params={"ensure_ascii": False}, safe=False)
     
-    elif request.method == "PATCH":
+    elif request.method == "POST":
         nme = request.POST.get("nme")
         date = now().strftime("%Y-%m-%d %H:%M:%S")
         if not nme:
-            return JsonResponse({"error":"Name is required"}, status=404)
+            return JsonResponse({"error": "Name is required"}, status=400)
         with connection.cursor() as cursor:
-            cursor.execute("UPDATE writers SET nme = %s, date = %s WHERE id = %s",[nme, date, writer_id])
-    return JsonResponse(
-        {
-            "success": True,
-            "message": f"Writer with ID {writer_id} updated successfully",
-            "writer_name": nme,
-            "date": date
-        },status=200,
-    )
-            
+            cursor.execute("UPDATE writers SET nme = %s, date = %s WHERE id = %s", [nme, date, writer_id])
+        return JsonResponse(
+            {
+                "success": True,
+                "message": f"Writer with ID {writer_id} updated successfully",
+                "writer_name": nme,
+                "date": date
+            }, status=200,
+        )
+    # Handle unsupported methods
+    return JsonResponse({"error": "Method not allowed"}, status=405)
+
 # delete writer
 @csrf_exempt
+@jwt_required
 def delete_writer_view(request, writer_id):
     if request.method != "DELETE":
         return JsonResponse({"error": "Method not allowed"}, status=405)
@@ -772,112 +832,116 @@ def delete_writer_view(request, writer_id):
 
 # # ------------------Editor-----------------------
 # #get all editors
-# def get_editors(request):
-#     return get_paginated_list(request, "admin1", order_by="AdminId")
+@jwt_required
+def get_editors(request):
+    return get_paginated_list(request, "admin1", order_by="AdminId")
 
-# # add editor
-# @csrf_exempt
-# def add_editor_views(request):
-#     if request.method != "POST":
-#         return JsonResponse({"error": "Method not allowed"}, status=405)
+# add editor
+@csrf_exempt
+@jwt_required
+def add_editor_views(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
 
-#     try:
-#         # Support both JSON body and query params
-#         if request.content_type == "application/json":
-#             data = json.loads(request.body)
-#         else:
-#             data = request.POST or request.GET  # Fallback to form/query params
+    try:
+        # Support both JSON body and query params
+        if request.content_type == "application/json":
+            data = json.loads(request.body)
+        else:
+            data = request.POST or request.GET  # Fallback to form/query params
 
-#         username = data.get("username")
-#         password = data.get("password")
-#         admin_type = data.get("adminType")
+        username = data.get("username")
+        password = data.get("password")
+        admin_type = data.get("adminType")
 
-#         if not username or not password or not admin_type:
-#             return JsonResponse({"error": "All fields are required"}, status=400)
+        if not username or not password or not admin_type:
+            return JsonResponse({"error": "All fields are required"}, status=400)
 
-#         if int(admin_type) not in [1, 2, 3, 4]:
-#             return JsonResponse({"error": "Invalid adminType"}, status=400)
+        if int(admin_type) not in [1, 2, 3, 4]:
+            return JsonResponse({"error": "Invalid adminType"}, status=400)
 
-#         date_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        date_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-#         with connection.cursor() as cursor:
-#             cursor.execute(
-#                 """
-#                 INSERT INTO admin1 (Username, Password, adminType, date, updDate)
-#                 VALUES (%s, %s, %s, %s, %s)
-#                 """,
-#                 [username, password, admin_type, date_now, date_now],
-#             )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO admin1 (Username, Password, adminType, date, updDate)
+                VALUES (%s, %s, %s, %s, %s)
+                """,
+                [username, password, admin_type, date_now, date_now],
+            )
 
-#         return JsonResponse({
-#             "message": "Editor added successfully",
-#             "editor": {
-#                 "username": username,
-#                 "adminType": admin_type,
-#                 "created_at": date_now
-#             }
-#         }, status=201)
+        return JsonResponse({
+            "message": "Editor added successfully",
+            "editor": {
+                "username": username,
+                "adminType": admin_type,
+                "created_at": date_now
+            }
+        }, status=201)
 
-#     except Exception as e:
-#         return JsonResponse({"error": str(e)}, status=500)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
     
-# # edit writer
-# @csrf_exempt
-# def edit_editor_views(request, editor_id):
-#     if request.method == "GET":
-#         # Fetch editor details
-#         with connection.cursor() as cursor:
-#             cursor.execute("SELECT AdminId, Username, adminType, date, updDate FROM admin1 WHERE AdminId=%s", [editor_id])
-#             row = cursor.fetchone()
-#             if not row:
-#                 return JsonResponse({"error": "Editor not found"}, status=404)
-#             columns = [col[0] for col in cursor.description]
-#             return JsonResponse(dict(zip(columns, row)))
+# edit writer
+@csrf_exempt
+@jwt_required
+def edit_editor_views(request, editor_id):
+    if request.method == "GET":
+        # Fetch editor details
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT AdminId, Username, adminType, date, updDate FROM admin1 WHERE AdminId=%s", [editor_id])
+            row = cursor.fetchone()
+            if not row:
+                return JsonResponse({"error": "Editor not found"}, status=404)
+            columns = [col[0] for col in cursor.description]
+            return JsonResponse(dict(zip(columns, row)))
 
-#     elif request.method == "POST":
-#         # Update editor
-#         username = request.POST.get("username")
-#         password = request.POST.get("password")
-#         admin_type = request.POST.get("adminType")
+    elif request.method == "POST":
+        # Update editor
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        admin_type = request.POST.get("adminType")
 
-#         if not (username or password or admin_type):
-#             return JsonResponse({"error": "No fields to update"}, status=400)
+        if not (username or password or admin_type):
+            return JsonResponse({"error": "No fields to update"}, status=400)
 
-#         updates, values = [], []
-#         if username:
-#             updates.append("Username=%s")
-#             values.append(username)
-#         if password:
-#             updates.append("Password=%s")
-#             values.append(password)
-#         if admin_type:
-#             updates.append("adminType=%s")
-#             values.append(admin_type)
+        updates, values = [], []
+        if username:
+            updates.append("Username=%s")
+            values.append(username)
+        if password:
+            updates.append("Password=%s")
+            values.append(password)
+        if admin_type:
+            updates.append("adminType=%s")
+            values.append(admin_type)
 
-#         updates.append("updDate=%s")
-#         values.append(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-#         values.append(editor_id)
+        updates.append("updDate=%s")
+        values.append(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        values.append(editor_id)
 
-#         try:
-#             with connection.cursor() as cursor:
-#                 cursor.execute(f"UPDATE admin1 SET {', '.join(updates)} WHERE AdminId=%s", values)
-#             return JsonResponse({"message": "Editor updated successfully"})
-#         except Exception as e:
-#             return JsonResponse({"error": str(e)}, status=500)
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(f"UPDATE admin1 SET {', '.join(updates)} WHERE AdminId=%s", values)
+            return JsonResponse({"message": "Editor updated successfully"})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
 
-#     else:
-#         return JsonResponse({"error": "Method not allowed"}, status=405)
+    else:
+        return JsonResponse({"error": "Method not allowed"}, status=405)
     
-# # delete editor
-# def delete_editor_views(request, editor_id):
-#     if request.method != "DELETE":
-#         return JsonResponse({"error": "Method not allowed"}, status=405)
+# delete editor
+@jwt_required
+def delete_editor_views(request, editor_id):
+    if request.method != "DELETE":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
 
 
-#     with connection.cursor() as cursor:
-#         cursor.execute("DELETE FROM admin1 WHERE AdminId = %s", [editor_id])
-#         if cursor.rowcount == 0:
-#             return JsonResponse({"error": "Editor not found"}, status=404)
-#     return JsonResponse({
-#         "message": "Editor deleted successfully",
-#         "editor_id": editor_id})
+    with connection.cursor() as cursor:
+        cursor.execute("DELETE FROM admin1 WHERE AdminId = %s", [editor_id])
+        if cursor.rowcount == 0:
+            return JsonResponse({"error": "Editor not found"}, status=404)
+    return JsonResponse({
+        "message": "Editor deleted successfully",
+        "editor_id": editor_id})

@@ -188,7 +188,7 @@ def restore_news(news_id):
         restore_news = fix_mojibake(restored_news)
         return restore_news
     
-    
+# ---------------------slider--------------------
 # Get slider data
 def get_slider_data():
     with connection.cursor() as cursor:
@@ -196,7 +196,6 @@ def get_slider_data():
         rows = cursor.fetchall()
         if not rows:
             return []
-        
         # Convert rows to dict format
         columns = [col[0] for col in cursor.description]
         results = [dict(zip(columns, row)) for row in rows]
@@ -269,36 +268,42 @@ def copy_news_records(news_id, newsType):
         return cursor.lastrowid
     
     
-    # ------------Social Media Seciton----------------
+# ---------------Social Media Seciton----------------
     
     # mark as posted in social media
 def mark_post_as_posted(news_id, account_id, request):
-    """Mark a social media post as posted by the logged-in user. Auto-create if missing."""
+    """Toggle a social media post's status between 0 and 1. Auto-create if missing."""
     user_id = getattr(request, "user_id", None)
     if not user_id:
         raise ValueError("User ID is missing. Did you forget to protect the route with @jwt_required?")
-    
+
     with connection.cursor() as cursor:
-        # Check if row exists
+        # Check if row exists & get current status
         cursor.execute("""
-            SELECT id FROM social_media_posts 
+            SELECT id, status FROM social_media_posts 
             WHERE news_id = %s AND account_id = %s
         """, [news_id, account_id])
-        exists = cursor.fetchone()
+        row = cursor.fetchone()
 
-        if not exists:
-            # Auto-create the row
+        if not row:
+            # Auto-create with status=0
             cursor.execute("""
                 INSERT INTO social_media_posts (news_id, account_id, status, userid, date)
                 VALUES (%s, %s, 0, %s, NOW())
             """, [news_id, account_id, user_id])
-        
-        # Update the post
-        cursor.execute("""
-            UPDATE social_media_posts 
-            SET status = 0, userid = %s, date = NOW() 
-            WHERE news_id = %s AND account_id = %s
-        """, [user_id, news_id, account_id])
+            new_status = 0  # default
+            message = "Post marked"
+        else:
+            current_status = row[1]
+            new_status = 1 if current_status == 0 else 0  # toggle
+            message = "Post unmarked" if new_status == 1 else "Post marked"
+
+            # Update the post with toggled status
+            cursor.execute("""
+                UPDATE social_media_posts 
+                SET status = %s, userid = %s, date = NOW() 
+                WHERE news_id = %s AND account_id = %s
+            """, [new_status, user_id, news_id, account_id])
 
         # Fetch updated row
         cursor.execute("""
@@ -309,7 +314,11 @@ def mark_post_as_posted(news_id, account_id, request):
         columns = [col[0] for col in cursor.description]
         updated_post = dict(zip(columns, row)) if row else None
 
-    return updated_post
+    return {
+        "message": message,
+        "post": updated_post
+    }
+
 
 # get comments 
 def get_comments_by_status(status, request):
