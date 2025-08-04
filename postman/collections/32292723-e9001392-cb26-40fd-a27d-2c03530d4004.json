@@ -153,8 +153,8 @@
 					"response": []
 				},
 				{
-					"name": "search by title",
-					"id": "32292723-bbc10f3b-15c4-4362-9c7b-af70fb5ea184",
+					"name": "delete news",
+					"id": "32292723-98d7bbd2-bd55-4725-a6e9-a2c7284f19df",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -165,8 +165,8 @@
 					"response": []
 				},
 				{
-					"name": "delete news",
-					"id": "32292723-98d7bbd2-bd55-4725-a6e9-a2c7284f19df",
+					"name": "search by title",
+					"id": "32292723-bbc10f3b-15c4-4362-9c7b-af70fb5ea184",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
