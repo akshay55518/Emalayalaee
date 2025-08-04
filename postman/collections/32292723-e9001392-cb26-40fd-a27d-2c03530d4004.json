@@ -165,7 +165,7 @@
 					"response": []
 				},
 				{
-					"name": "New Request",
+					"name": "delete news",
 					"id": "32292723-98d7bbd2-bd55-4725-a6e9-a2c7284f19df",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
