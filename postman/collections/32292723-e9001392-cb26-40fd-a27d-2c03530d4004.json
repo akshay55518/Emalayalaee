@@ -210,7 +210,7 @@
 							"response": []
 						},
 						{
-							"name": "search and block",
+							"name": "search ip",
 							"id": "32292723-cad7c8ac-a16b-4d33-afcb-55d0a53e970d",
 							"protocolProfileBehavior": {
 								"disableBodyPruning": true
