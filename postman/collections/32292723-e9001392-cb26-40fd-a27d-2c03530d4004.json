@@ -591,7 +591,7 @@
 			"name": "Home",
 			"item": [
 				{
-					"name": "New Request",
+					"name": "news_count",
 					"id": "32292723-bcfcc2eb-6736-437d-b935-1476f5f4c682",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
