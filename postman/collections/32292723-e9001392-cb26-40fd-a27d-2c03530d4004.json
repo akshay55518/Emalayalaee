@@ -603,7 +603,7 @@
 					"response": []
 				},
 				{
-					"name": "New Request",
+					"name": "last_updated",
 					"id": "32292723-d8e1c29d-8029-4f30-b246-2b5cdd120384",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
