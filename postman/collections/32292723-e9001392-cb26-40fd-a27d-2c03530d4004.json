@@ -630,8 +630,21 @@
 			"id": "32292723-abefc40d-8b54-4b89-a349-be0f97060d85"
 		},
 		{
-			"name": "New Folder",
-			"item": [],
+			"name": "analytics",
+			"item": [
+				{
+					"name": "New Request",
+					"id": "32292723-40f08f48-6887-41f6-bd08-d5992a947531",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			],
 			"id": "32292723-553c8751-9a69-4e67-8712-b242b13ea949"
 		},
 		{
