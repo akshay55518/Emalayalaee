@@ -165,7 +165,7 @@
 					"response": []
 				},
 				{
-					"name": "search by title",
+					"name": "search news",
 					"id": "32292723-bbc10f3b-15c4-4362-9c7b-af70fb5ea184",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -586,6 +586,66 @@
 				}
 			],
 			"id": "32292723-02a65594-f09c-4184-9501-db5eeb7a84c5"
+		},
+		{
+			"name": "Home",
+			"item": [
+				{
+					"name": "news_count",
+					"id": "32292723-bcfcc2eb-6736-437d-b935-1476f5f4c682",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "last_updated",
+					"id": "32292723-d8e1c29d-8029-4f30-b246-2b5cdd120384",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "todays_update",
+					"id": "32292723-d692ceb1-9932-4838-bb78-490e57d0df81",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			],
+			"id": "32292723-abefc40d-8b54-4b89-a349-be0f97060d85"
+		},
+		{
+			"name": "analytics",
+			"item": [
+				{
+					"name": "active-users",
+					"id": "32292723-40f08f48-6887-41f6-bd08-d5992a947531",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			],
+			"id": "32292723-553c8751-9a69-4e67-8712-b242b13ea949"
 		},
 		{
 			"name": "Login",
