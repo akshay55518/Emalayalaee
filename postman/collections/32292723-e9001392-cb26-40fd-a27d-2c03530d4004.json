@@ -633,7 +633,7 @@
 			"name": "analytics",
 			"item": [
 				{
-					"name": "New Request",
+					"name": "active-users",
 					"id": "32292723-40f08f48-6887-41f6-bd08-d5992a947531",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
