@@ -630,6 +630,11 @@
 			"id": "32292723-abefc40d-8b54-4b89-a349-be0f97060d85"
 		},
 		{
+			"name": "New Folder",
+			"item": [],
+			"id": "32292723-553c8751-9a69-4e67-8712-b242b13ea949"
+		},
+		{
 			"name": "Login",
 			"id": "32292723-91f19d5d-bdca-48a3-97b2-0e12bcb0284f",
 			"protocolProfileBehavior": {
