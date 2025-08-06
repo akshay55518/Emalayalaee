@@ -1,5 +1,5 @@
 from django.views.decorators.csrf import csrf_exempt
-from datetime import datetime
+from datetime import datetime, date
 from django.utils.timezone import now
 from .db_access import *
 from .language_utils import fix_mojibake
@@ -7,6 +7,8 @@ from .login_authetication import jwt_required
 from .db_access import mark_post_as_posted
 from django.http import JsonResponse
 import json
+import os
+
 
 # -------- Helper for pagination ----------
 def get_paginated_list(request, table_name, order_by):
@@ -247,21 +249,39 @@ def restore_news_view(request, news_id):
 # -------- Add / Edit news --------
 @jwt_required
 @csrf_exempt
-def add_news_view(request):
+def add_news_view(request, newsType=None):  # <-- Capture from URL
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
 
     try:
-        # Collect fields
-        newsType = request.POST.get("newsType")
+        # Prefer URL param over POST
+        newsType = newsType or request.POST.get("newsType")
+        if not newsType:
+            return JsonResponse({"error": "newsType is required"}, status=400)
+
         newsHde = request.POST.get("newsHde")
         news = request.POST.get("news")
-        images2 = request.POST.get("images2", "")
+        language = request.POST.get("language")
         name = request.POST.get("byline")
+
+        # Validate required fields
+        required_fields = {
+            "newsType": newsType,
+            "newsHde": newsHde,
+            "news": news,
+        }
+        missing_fields = [field for field, value in required_fields.items() if not value]
+        if missing_fields:
+            return JsonResponse({
+                "error": "Missing required fields",
+                "missing_fields": missing_fields
+            }, status=400)
+
+        # Remaining fields
+        images2 = request.POST.get("images2", "")
         news2 = request.POST.get("content", "")
         images = request.POST.get("images", "")
         fdfNte = request.POST.get("fdfNte", "")
-        language = request.POST.get("language")
         top = request.POST.get("top", 0)
         slider = request.POST.get("slider", 0)
         imgVisibility = request.POST.get("imgVisibility")
@@ -283,11 +303,12 @@ def add_news_view(request):
         video_type = request.POST.get("video_type")
         video_url = request.POST.get("video_url")
 
-        # Handle file uploads
+        # File uploads (same as before)
         pdf_file = request.FILES.get("pdf_file")
         pdf_path = None
         if pdf_file:
             pdf_path = f"uploads/pdf/{pdf_file.name}"
+            os.makedirs(os.path.dirname(f"media/{pdf_path}"), exist_ok=True)
             with open(f"media/{pdf_path}", "wb+") as destination:
                 for chunk in pdf_file.chunks():
                     destination.write(chunk)
@@ -296,16 +317,16 @@ def add_news_view(request):
         image_paths = []
         for file in uploaded_files:
             file_path = f"uploads/{file.name}"
+            os.makedirs(os.path.dirname(f"media/{file_path}"), exist_ok=True)
             with open(f"media/{file_path}", "wb+") as destination:
                 for chunk in file.chunks():
                     destination.write(chunk)
             image_paths.append(file_path)
         
         images = "@*@".join(image_paths)
-        
         date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # Insert & fetch in same cursor block
+        # DB Insert (same as before)
         with connection.cursor() as cursor:
             cursor.execute(
                 """
@@ -335,7 +356,6 @@ def add_news_view(request):
             )
             last_id = cursor.lastrowid
 
-            # Fetch inserted record immediately
             cursor.execute("SELECT * FROM newsmalayalam WHERE id = %s", [last_id])
             row = cursor.fetchone()
             columns = [col[0] for col in cursor.description]
@@ -945,3 +965,76 @@ def delete_editor_views(request, editor_id):
     return JsonResponse({
         "message": "Editor deleted successfully",
         "editor_id": editor_id})
+    
+# -------------home page details----------------
+# count the total number of articles
+@jwt_required
+def total_news_count(request):
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT COUNT(*) FROM newsmalayalam")
+        total = cursor.fetchone()[0]
+    return JsonResponse({
+        "status": 200,
+        "message": "Total news count fetched successfully",
+        "total_news": total
+    })
+
+# last updated by
+@jwt_required
+def get_last_update(request):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+            n.id, 
+            n.newsHde, 
+            a.Username AS editor
+            FROM newsmalayalam n
+            LEFT JOIN admin1 a ON n.status_mge = a.AdminId
+            WHERE n.date IS NOT NULL
+            ORDER BY n.date DESC, n.id DESC
+            LIMIT 1;
+        """)
+        rows = cursor.fetchall()
+        columns = [col[0] for col in cursor.description]
+        results = [dict(zip(columns, row)) for row in rows]
+    results = fix_mojibake(results)
+    return JsonResponse({
+        "code": 200,
+        "message": "Last updated by news fetched successfully",
+        "results": results
+    })
+    
+# todays updates
+@jwt_required
+def updates_today_view(request):
+    today = date.today().strftime("%Y-%m-%d")  # Gets current date as "2025-08-05"  
+    with connection.cursor() as cursor:
+    # Query to get today's news with admin info
+        query = """
+            SELECT 
+            n.id,  
+            n.date, 
+            a.Username AS editor
+            FROM newsmalayalam n
+            LEFT JOIN admin1 a ON n.status_mge = a.AdminId
+            WHERE n.date IS NOT NULL
+            AND DATE(n.date) = %s  -- Filter by today's date
+            ORDER BY n.date DESC;
+        """
+        cursor.execute(query, [today]) 
+            # Format results
+        rows = cursor.fetchall()
+        if rows:
+            columns = [col[0] for col in cursor.description]
+            results = [dict(zip(columns, row)) for row in rows]
+        else:
+            results = []
+                
+    return JsonResponse({
+        "code": 200,
+        "message": f"Today's news updates ({today})",
+        "query_date": today,
+        "count": len(results),
+        "results": results,
+      
+    })

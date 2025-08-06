@@ -8,10 +8,11 @@ urlpatterns = [
     
     path("advt/", include("advertisement.urls")),
     
-    # path("", include("EM_app.urls")),
+    path("analytics/", include("EM_app.urls")),
      
     # count information displayed in the home part
     path("home/", home_count_view, name="home"),
+    
     # articles published today
     path("articles_today/", articles_today, name="todays_articles"),
    

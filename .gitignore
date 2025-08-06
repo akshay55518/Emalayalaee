@@ -2,6 +2,8 @@
 __pycache__/
 db.sqlite3
 .env
+/config/service-account-key.json
+*.json
 *.log
 /staticfiles/
 media/

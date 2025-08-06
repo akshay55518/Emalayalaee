@@ -12,9 +12,10 @@ urlpatterns = [
      # Get news by ID
     path('news/<str:news_id>/', views.get_news_by_id_views, name='get_news_by_id_views'),
     # Add news
-    path('add-news/', views.add_news_view, name='add_news'),
+    # path('add-news/', views.add_news_view, name='add_news'),
+    path('add-news/<str:newsType>/', views.add_news_view, name='add_news'),
     # Edit news
-    path("edit-news/<int:news_id>/", views.edit_news_view, name="edit_news"),
+    path('edit-news/<int:news_id>/', views.edit_news_view, name='edit_news'),
     # Search news by title
     path('search-news/<str:title>/', views.search_news_views, name='search_news_by_title'),
 
@@ -110,4 +111,10 @@ urlpatterns = [
     path('edit-editor/<int:editor_id>', views.edit_editor_views, name='edit-editor'),
     # delete editors
     path('delete-editor/<int:editor_id>', views.delete_editor_views, name='delete-editor'),
+    
+    # ------------------------Home page ----------------------------
+    path('news-count/', views.total_news_count, name='news-count'),
+    path('last-updated/', views.get_last_update, name='last-updated'),
+    path('updates-today/', views.updates_today_view, name='updates-today'),
+    
 ]

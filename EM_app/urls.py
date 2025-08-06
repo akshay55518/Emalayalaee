@@ -1,41 +1,12 @@
 from django.urls import path
-
-from EM_app import Login
-from EM_app.views import *
-
-
+from .views import *
 
 urlpatterns = [
-
-    # Analytics
-    path('activities/', activity_list, name='activity-list'),
-    path('event_occurrences/',event_occurrence_view, name='events'),
-    path('events/',page_views_chart_data, name='eventsPerDay'),
-    path('session/', session_view, name='session'),
-    path('active_users/',get_active_users, name='users_active'),
-
-
-
-
-    # Editors
-
-    path('admins/', admin_list_view, name='admin-list'),
-    path('admins/<int:admin_id>/delete/', delete_admin_view, name='admin-delete'),
-    path('admins/<int:admin_id>/edit/', update_admin_view, name='admin-update'),
-    path('admins/create/', create_admin_view, name='admin-create'),
-    path('admins/<int:admin_id>/', get_editor_view, name='get-editor'),
-    path('admin/roles/', get_roles, name='get_roles'),
-
-  
-
-
-
-
-
-
-
-
-
-
+    # path('active-users/', Activeusers.as_view(), name='analytics'),
+    # path('events/', SimpleGA4AnalyticsView.as_view(), name="events"),
+    # path('sessions/', get_sessions_historical, name='sessions')
+    path("active-users/", ActiveUsersView.as_view(), name="active_users"),
+    path("page-views/", BasicMetricsView.as_view(), name="basic_metrics"),
+    path("events/", EventMetricsView.as_view(), name="event_metrics"),
+    path("sessions/", get_sessions_historical, name="sessions"),
 ]
-
