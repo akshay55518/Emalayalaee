@@ -669,7 +669,7 @@
 					"response": []
 				},
 				{
-					"name": "New Request",
+					"name": "sessions",
 					"id": "32292723-a93050ac-1a2f-4ebe-a111-baed768da1c4",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
