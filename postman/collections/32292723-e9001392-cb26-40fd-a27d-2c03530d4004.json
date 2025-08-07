@@ -645,7 +645,7 @@
 					"response": []
 				},
 				{
-					"name": "New Request",
+					"name": "page-views",
 					"id": "32292723-a4ced487-c829-475a-a2fb-f8c583fcd1ce",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
