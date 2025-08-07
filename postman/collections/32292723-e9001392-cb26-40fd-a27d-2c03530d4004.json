@@ -657,7 +657,7 @@
 					"response": []
 				},
 				{
-					"name": "New Request",
+					"name": "events",
 					"id": "32292723-3490ee11-0771-49de-9068-d6893ef8ad38",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
