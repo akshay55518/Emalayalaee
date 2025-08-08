@@ -230,8 +230,20 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/copy-news/346679/AMERICA/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"copy-news",
+								"346679",
+								"AMERICA",
+								""
+							]
+						}
 					},
 					"response": []
 				},
