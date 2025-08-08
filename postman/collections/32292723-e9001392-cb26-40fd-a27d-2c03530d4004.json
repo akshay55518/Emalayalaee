@@ -410,7 +410,17 @@
 							},
 							"request": {
 								"method": "GET",
-								"header": []
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/blocked-ips/",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"blocked-ips",
+										""
+									]
+								}
 							},
 							"response": []
 						},
