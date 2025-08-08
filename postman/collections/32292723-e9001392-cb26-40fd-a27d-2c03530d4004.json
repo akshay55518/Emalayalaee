@@ -1353,8 +1353,47 @@
 						"disableBodyPruning": true
 					},
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2OTYsImlhdCI6MTc1NDQ4OTUyMSwiZXhwIjoxNzU3MDgxNTIxfQ.pI0K58UfPEi3tZ_5O-wQAdn0MvfjSVuPlPGTYkfT5Cs",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
-						"header": []
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "Username",
+									"value": "silji",
+									"type": "text",
+									"uuid": "8df61719-c7f2-4232-b6d6-f01630bcbdc1"
+								},
+								{
+									"key": "Password",
+									"value": "6VfZFr6emets",
+									"type": "text",
+									"uuid": "91768c70-2d78-4d52-a4d4-02bf66bbbe7a"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseURL}}/advt/search/137.97.171.46/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"advt",
+								"search",
+								"137.97.171.46",
+								""
+							]
+						}
 					},
 					"response": []
 				},
