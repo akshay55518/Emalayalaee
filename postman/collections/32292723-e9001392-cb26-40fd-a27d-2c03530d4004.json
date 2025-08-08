@@ -643,6 +643,42 @@
 						"header": []
 					},
 					"response": []
+				},
+				{
+					"name": "page-views",
+					"id": "32292723-a4ced487-c829-475a-a2fb-f8c583fcd1ce",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "events",
+					"id": "32292723-3490ee11-0771-49de-9068-d6893ef8ad38",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "sessions",
+					"id": "32292723-a93050ac-1a2f-4ebe-a111-baed768da1c4",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
 				}
 			],
 			"id": "32292723-553c8751-9a69-4e67-8712-b242b13ea949"
