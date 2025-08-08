@@ -454,8 +454,45 @@
 								"disableBodyPruning": true
 							},
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2OTYsImlhdCI6MTc1NDQ4OTUyMSwiZXhwIjoxNzU3MDgxNTIxfQ.pI0K58UfPEi3tZ_5O-wQAdn0MvfjSVuPlPGTYkfT5Cs",
+											"type": "string"
+										}
+									]
+								},
 								"method": "GET",
-								"header": []
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "search_ip",
+											"value": "50.215.83.22",
+											"type": "text",
+											"uuid": "4079e15e-a454-4a67-874d-78da716fe219"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/search-ip/?blocked_ip=50.215.83.22",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"search-ip",
+										""
+									],
+									"query": [
+										{
+											"key": "blocked_ip",
+											"value": "50.215.83.22"
+										}
+									]
+								}
 							},
 							"response": []
 						},
