@@ -126,15 +126,10 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/permanently-delete-news/346674/",
-							"protocol": "http",
+							"raw": "{{baseURL}}/permanently-delete-news/346674/",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{baseURL}}"
 							],
-							"port": "8000",
 							"path": [
 								"permanently-delete-news",
 								"346674",
@@ -334,15 +329,10 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/block-ip/100551/",
-							"protocol": "http",
+							"raw": "{{baseURL}}/block-ip/100551/",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{baseURL}}"
 							],
-							"port": "8000",
 							"path": [
 								"block-ip",
 								"100551",
@@ -738,6 +728,13 @@
 				"header": []
 			},
 			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "http://127.0.0.1:8000",
+			"type": "default"
 		}
 	]
 }
