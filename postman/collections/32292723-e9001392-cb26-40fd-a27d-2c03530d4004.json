@@ -149,8 +149,65 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2OTYsImlhdCI6MTc1NDQ4OTUyMSwiZXhwIjoxNzU3MDgxNTIxfQ.pI0K58UfPEi3tZ_5O-wQAdn0MvfjSVuPlPGTYkfT5Cs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "",
+									"value": "",
+									"type": "text",
+									"uuid": "4c4ff691-b77f-4e62-8e23-338889462a31",
+									"disabled": true
+								},
+								{
+									"key": "newsHde",
+									"value": "testing 2",
+									"type": "text",
+									"uuid": "73b4e34c-ec12-40ea-91ab-7442df33d14a"
+								},
+								{
+									"key": "news",
+									"value": "new update 1",
+									"type": "text",
+									"uuid": "9b74387a-a04d-45d4-9126-cac7c4b616f8"
+								},
+								{
+									"key": "name",
+									"value": "admin test1",
+									"type": "text",
+									"uuid": "cbb097ba-0061-45a0-a5e8-f50301289a62"
+								},
+								{
+									"key": "status_cur",
+									"value": "0",
+									"type": "text",
+									"uuid": "f9992b42-b23d-4e72-a962-593aa74b2b5a"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseURL}}/add-news/AMERICA/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"add-news",
+								"AMERICA",
+								""
+							]
+						}
 					},
 					"response": []
 				},
