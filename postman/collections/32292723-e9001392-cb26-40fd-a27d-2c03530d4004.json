@@ -1518,8 +1518,28 @@
 						"disableBodyPruning": true
 					},
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo3MDMsImlhdCI6MTc1NDM3NzI3OSwiZXhwIjoxNzU2OTY5Mjc5fQ.4rGZ1mA6_sGXs02IRyuVPS-LMbvfJILP0aVA9ewb8RI",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/updates-today/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"updates-today",
+								""
+							]
+						}
 					},
 					"response": []
 				}
