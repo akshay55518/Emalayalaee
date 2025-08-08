@@ -902,7 +902,17 @@
 					},
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/obituaries/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"obituaries",
+								""
+							]
+						}
 					},
 					"response": []
 				},
