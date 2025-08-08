@@ -583,6 +583,18 @@
 						"header": []
 					},
 					"response": []
+				},
+				{
+					"name": "edit",
+					"id": "32292723-8c8117bc-844b-47fa-a1b7-80966b9ae3bc",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
 				}
 			],
 			"id": "32292723-02a65594-f09c-4184-9501-db5eeb7a84c5"
