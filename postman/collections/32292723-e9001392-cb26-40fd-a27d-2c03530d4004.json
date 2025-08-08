@@ -840,7 +840,17 @@
 					},
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/count-social/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"count-social",
+								""
+							]
+						}
 					},
 					"response": []
 				},
