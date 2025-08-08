@@ -924,7 +924,17 @@
 					},
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/obituaries/5281",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"obituaries",
+								"5281"
+							]
+						}
 					},
 					"response": []
 				}
