@@ -1404,8 +1404,40 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2OTYsImlhdCI6MTc1NDQ4OTUyMSwiZXhwIjoxNzU3MDgxNTIxfQ.pI0K58UfPEi3tZ_5O-wQAdn0MvfjSVuPlPGTYkfT5Cs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "ashitha",
+									"type": "text",
+									"uuid": "16e277c2-6bff-4fc6-8aac-f9d10a2ccd71"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseURL}}/advt/edit-adv/63",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"advt",
+								"edit-adv",
+								"63"
+							]
+						}
 					},
 					"response": []
 				}
