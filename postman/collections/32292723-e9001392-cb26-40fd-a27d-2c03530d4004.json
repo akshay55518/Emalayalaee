@@ -126,7 +126,19 @@
 					},
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/news-types-cur/INDIA/0/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"news-types-cur",
+								"INDIA",
+								"0",
+								""
+							]
+						}
 					},
 					"response": []
 				},
