@@ -322,8 +322,18 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/publish-news/346669",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"publish-news",
+								"346669"
+							]
+						}
 					},
 					"response": []
 				},
