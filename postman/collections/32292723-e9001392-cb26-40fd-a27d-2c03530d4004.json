@@ -472,8 +472,29 @@
 						"disableBodyPruning": true
 					},
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo3MDMsImlhdCI6MTc1NDMyMzMwNCwiZXhwIjoxNzU2OTE1MzA0fQ.PddT6Pcg15AE772G2sR_bfGLPl8jyVq8gqSjSoG2VXo",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}0/comments/100550/",
+							"host": [
+								"{{baseURL}}0"
+							],
+							"path": [
+								"comments",
+								"100550",
+								""
+							]
+						}
 					},
 					"response": []
 				},
