@@ -503,8 +503,39 @@
 								"disableBodyPruning": true
 							},
 							"request": {
-								"method": "GET",
-								"header": []
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2OTYsImlhdCI6MTc1NDQ4OTUyMSwiZXhwIjoxNzU3MDgxNTIxfQ.pI0K58UfPEi3tZ_5O-wQAdn0MvfjSVuPlPGTYkfT5Cs",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "blocked_ip",
+											"value": "50.215.83.23",
+											"type": "text",
+											"uuid": "e79f1ec4-5647-4544-a35f-34f3d024c70a"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseURL}}/search-block/",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"search-block",
+										""
+									]
+								}
 							},
 							"response": []
 						}
