@@ -1655,8 +1655,29 @@
 						"disableBodyPruning": true
 					},
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2OTYsImlhdCI6MTc1NDQ4OTUyMSwiZXhwIjoxNzU3MDgxNTIxfQ.pI0K58UfPEi3tZ_5O-wQAdn0MvfjSVuPlPGTYkfT5Cs",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/analytics/sessions/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"analytics",
+								"sessions",
+								""
+							]
+						}
 					},
 					"response": []
 				}
@@ -1670,8 +1691,27 @@
 				"disableBodyPruning": true
 			},
 			"request": {
-				"method": "GET",
-				"header": []
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Username\":\"intern\",\r\n    \"Password\":\"T9v@zP#3rLq8!nXe\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/api-login/",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api-login",
+						""
+					]
+				}
 			},
 			"response": []
 		}
