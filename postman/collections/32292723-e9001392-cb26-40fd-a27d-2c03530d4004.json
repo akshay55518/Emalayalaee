@@ -15,8 +15,28 @@
 						"disableBodyPruning": true
 					},
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2OTYsImlhdCI6MTc1NDMwMTk0NSwiZXhwIjoxNzU2ODkzOTQ1fQ.b2rRyEG6CtCktYtCuT7VIuwElouubcSJ8KQO0qGqqjY",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/news/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"news",
+								""
+							]
+						}
 					},
 					"response": []
 				},
@@ -27,8 +47,29 @@
 						"disableBodyPruning": true
 					},
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2OTYsImlhdCI6MTc1NDQ4OTUyMSwiZXhwIjoxNzU3MDgxNTIxfQ.pI0K58UfPEi3tZ_5O-wQAdn0MvfjSVuPlPGTYkfT5Cs",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/news/346661/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"news",
+								"346661",
+								""
+							]
+						}
 					},
 					"response": []
 				},
@@ -40,7 +81,17 @@
 					},
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/newsTypes/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"newsTypes",
+								""
+							]
+						}
 					},
 					"response": []
 				},
@@ -52,7 +103,18 @@
 					},
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/news-types/AMERICA/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"news-types",
+								"AMERICA",
+								""
+							]
+						}
 					},
 					"response": []
 				},
@@ -64,7 +126,19 @@
 					},
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/news-types-cur/INDIA/0/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"news-types-cur",
+								"INDIA",
+								"0",
+								""
+							]
+						}
 					},
 					"response": []
 				},
@@ -75,8 +149,65 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2OTYsImlhdCI6MTc1NDQ4OTUyMSwiZXhwIjoxNzU3MDgxNTIxfQ.pI0K58UfPEi3tZ_5O-wQAdn0MvfjSVuPlPGTYkfT5Cs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "",
+									"value": "",
+									"type": "text",
+									"uuid": "4c4ff691-b77f-4e62-8e23-338889462a31",
+									"disabled": true
+								},
+								{
+									"key": "newsHde",
+									"value": "testing 2",
+									"type": "text",
+									"uuid": "73b4e34c-ec12-40ea-91ab-7442df33d14a"
+								},
+								{
+									"key": "news",
+									"value": "new update 1",
+									"type": "text",
+									"uuid": "9b74387a-a04d-45d4-9126-cac7c4b616f8"
+								},
+								{
+									"key": "name",
+									"value": "admin test1",
+									"type": "text",
+									"uuid": "cbb097ba-0061-45a0-a5e8-f50301289a62"
+								},
+								{
+									"key": "status_cur",
+									"value": "0",
+									"type": "text",
+									"uuid": "f9992b42-b23d-4e72-a962-593aa74b2b5a"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseURL}}/add-news/AMERICA/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"add-news",
+								"AMERICA",
+								""
+							]
+						}
 					},
 					"response": []
 				},
@@ -99,8 +230,20 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/copy-news/346679/AMERICA/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"copy-news",
+								"346679",
+								"AMERICA",
+								""
+							]
+						}
 					},
 					"response": []
 				},
@@ -123,8 +266,19 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/permanently-delete-news/346674/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"permanently-delete-news",
+								"346674",
+								""
+							]
+						}
 					},
 					"response": []
 				},
@@ -135,8 +289,29 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2OTYsImlhdCI6MTc1NDQ4OTUyMSwiZXhwIjoxNzU3MDgxNTIxfQ.pI0K58UfPEi3tZ_5O-wQAdn0MvfjSVuPlPGTYkfT5Cs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/restore-news/346691/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"restore-news",
+								"346691",
+								""
+							]
+						}
 					},
 					"response": []
 				},
@@ -147,8 +322,18 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/publish-news/346669",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"publish-news",
+								"346669"
+							]
+						}
 					},
 					"response": []
 				},
@@ -159,8 +344,29 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2OTYsImlhdCI6MTc1NDQ4OTUyMSwiZXhwIjoxNzU3MDgxNTIxfQ.pI0K58UfPEi3tZ_5O-wQAdn0MvfjSVuPlPGTYkfT5Cs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/delete-news/346691/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"delete-news",
+								"346691",
+								""
+							]
+						}
 					},
 					"response": []
 				},
@@ -315,8 +521,19 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/block-ip/100551/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"block-ip",
+								"100551",
+								""
+							]
+						}
 					},
 					"response": []
 				}
@@ -583,6 +800,18 @@
 						"header": []
 					},
 					"response": []
+				},
+				{
+					"name": "edit",
+					"id": "32292723-8c8117bc-844b-47fa-a1b7-80966b9ae3bc",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
 				}
 			],
 			"id": "32292723-02a65594-f09c-4184-9501-db5eeb7a84c5"
@@ -694,6 +923,13 @@
 				"header": []
 			},
 			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "http://127.0.0.1:8000",
+			"type": "default"
 		}
 	]
 }
