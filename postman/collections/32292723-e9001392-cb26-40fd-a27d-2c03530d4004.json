@@ -1016,8 +1016,19 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/delete-writer/317/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"delete-writer",
+								"317",
+								""
+							]
+						}
 					},
 					"response": []
 				},
