@@ -1319,8 +1319,30 @@
 						"disableBodyPruning": true
 					},
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2OTYsImlhdCI6MTc1NDQ4OTUyMSwiZXhwIjoxNzU3MDgxNTIxfQ.pI0K58UfPEi3tZ_5O-wQAdn0MvfjSVuPlPGTYkfT5Cs",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/advt/visitor/11/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"advt",
+								"visitor",
+								"11",
+								""
+							]
+						}
 					},
 					"response": []
 				},
