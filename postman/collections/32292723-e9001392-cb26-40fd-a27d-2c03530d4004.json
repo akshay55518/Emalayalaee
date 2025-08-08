@@ -1039,8 +1039,39 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2OTYsImlhdCI6MTc1NDQ4OTUyMSwiZXhwIjoxNzU3MDgxNTIxfQ.pI0K58UfPEi3tZ_5O-wQAdn0MvfjSVuPlPGTYkfT5Cs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "nme",
+									"value": "akshay",
+									"type": "text",
+									"uuid": "5e2bea48-30ba-4c5f-b64e-a508f98acd9f"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseURL}}/add-writer/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"add-writer",
+								""
+							]
+						}
 					},
 					"response": []
 				},
