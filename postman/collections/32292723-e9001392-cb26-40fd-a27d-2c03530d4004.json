@@ -1051,8 +1051,30 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "nme",
+									"value": "akshay",
+									"type": "text",
+									"uuid": "5c191d68-644b-4b9d-8742-2b34d940a2e9"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseURL}}/edit-writer/318/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"edit-writer",
+								"318",
+								""
+							]
+						}
 					},
 					"response": []
 				}
