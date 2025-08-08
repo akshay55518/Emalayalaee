@@ -1154,8 +1154,55 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "neweditor",
+									"type": "text",
+									"uuid": "1851b5df-3f74-42c7-ba05-3e587a7a1561"
+								},
+								{
+									"key": "password",
+									"value": "12345699",
+									"type": "text",
+									"uuid": "640e70aa-3688-411e-bfc9-d8c299274bae"
+								},
+								{
+									"key": "adminType",
+									"value": "1",
+									"type": "text",
+									"uuid": "3fbe4469-d358-4fad-9cc8-973d978e3ed8"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseURL}}/add-editor/?username=akshay&password=123456&adminType=1",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"add-editor",
+								""
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "akshay"
+								},
+								{
+									"key": "password",
+									"value": "123456"
+								},
+								{
+									"key": "adminType",
+									"value": "1"
+								}
+							]
+						}
 					},
 					"response": []
 				},
