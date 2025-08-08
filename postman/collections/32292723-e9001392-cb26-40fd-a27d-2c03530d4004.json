@@ -378,7 +378,18 @@
 					},
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/search-news/346682/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"search-news",
+								"346682",
+								""
+							]
+						}
 					},
 					"response": []
 				}
