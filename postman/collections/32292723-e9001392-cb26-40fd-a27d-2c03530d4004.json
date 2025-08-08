@@ -72,7 +72,18 @@
 					},
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/news-types/AMERICA/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"news-types",
+								"AMERICA",
+								""
+							]
+						}
 					},
 					"response": []
 				},
