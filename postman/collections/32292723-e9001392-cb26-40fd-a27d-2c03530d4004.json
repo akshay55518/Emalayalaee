@@ -431,8 +431,19 @@
 								"disableBodyPruning": true
 							},
 							"request": {
-								"method": "GET",
-								"header": []
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/unblock-ips/497/",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"unblock-ips",
+										"497",
+										""
+									]
+								}
 							},
 							"response": []
 						},
