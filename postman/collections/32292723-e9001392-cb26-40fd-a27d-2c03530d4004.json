@@ -525,8 +525,29 @@
 						"disableBodyPruning": true
 					},
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2OTYsImlhdCI6MTc1NDM3MDQ3NywiZXhwIjoxNzU2OTYyNDc3fQ.0lcPdzHoabTQcEeVLSyyvkaH0VCHY0i1jnNz1KEyr64",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/status-comments/1/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"status-comments",
+								"1",
+								""
+							]
+						}
 					},
 					"response": []
 				},
