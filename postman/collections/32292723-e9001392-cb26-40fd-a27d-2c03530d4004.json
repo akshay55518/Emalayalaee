@@ -1258,8 +1258,18 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/delete-editor/706",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"delete-editor",
+								"706"
+							]
+						}
 					},
 					"response": []
 				}
