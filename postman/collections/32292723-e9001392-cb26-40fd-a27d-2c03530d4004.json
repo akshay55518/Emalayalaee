@@ -1213,8 +1213,41 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "ashitha",
+									"type": "text",
+									"uuid": "13cdb22d-a36c-488a-96b5-e1c8700c18d1"
+								},
+								{
+									"key": "password",
+									"value": "54321",
+									"type": "text",
+									"uuid": "87bdb351-0183-407d-9e86-aaaceedac4b3"
+								},
+								{
+									"key": "adminType",
+									"value": "1",
+									"type": "text",
+									"uuid": "490d8c4c-63ff-49f7-aa10-71163a5d0263"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseURL}}/edit-editor/703",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"edit-editor",
+								"703"
+							]
+						}
 					},
 					"response": []
 				},
