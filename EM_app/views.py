@@ -5,9 +5,12 @@ from google.analytics.data_v1beta.types import RunRealtimeReportRequest, Dimensi
 from django.conf import settings
 from datetime import datetime
 import logging
+from django.utils.decorators import method_decorator
+from Emalayalee_APP.login_authetication import jwt_required
 
 logger = logging.getLogger(__name__)
 
+@method_decorator(jwt_required, name='dispatch')
 class ActiveUsersView(View):
     """Replicates the 'Active Users in Last 30 Minutes' dashboard"""
 
@@ -52,7 +55,7 @@ class ActiveUsersView(View):
                 "solution": "Check your GA4 property ID and service account permissions",
             }, status=500)
 
-
+@method_decorator(jwt_required, name='dispatch')
 class BasicMetricsView(View):
     """Simplified GA4 analytics endpoint for active users & page views"""
 
@@ -85,7 +88,7 @@ class BasicMetricsView(View):
             logger.error(f"GA4 Error: {str(e)}")
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
         
-            
+@method_decorator(jwt_required, name='dispatch')          
 class EventMetricsView(View):
     """Get event counts and key events"""
 
@@ -115,7 +118,8 @@ class EventMetricsView(View):
         except Exception as e:
             logger.error(f"Event Metrics Error: {str(e)}")
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
-        
+  
+@jwt_required      
 def get_sessions_historical(request, days=7):
     """Get session counts for specified time period"""
     try:

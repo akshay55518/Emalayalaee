@@ -1,5 +1,6 @@
 from django.db import connection
 from datetime import datetime
+from django.utils import timezone
 from .language_utils import fix_mojibake
 from .pagination import build_pagination, fetch_paginated_data
 from .record_utils import add_full_urls
@@ -137,22 +138,42 @@ def get_news_by_type_and_status(news_type, status_cur, request):
         **build_pagination(base_url, page, page_size, total_records)
     }
 
+# move to resycle bin table for all 
+def move_to_resycle_table(newsid, mge, nswstype, db):
+    now = timezone.now()
+    insert_sql = """
+        INSERT INTO resycle (newsid, mge, nswstype, db, date)
+        VALUES (%s, %s, %s, %s, %s)
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(insert_sql, [newsid, mge, nswstype, db, now])
 
 # Publish news
-def update_news_status(news_id, new_status):
-    # New status value (0=Published, 1=Deleted, 2=Draft)
+def update_news_status(news_id, new_status, db="newsmalayalam"):
     with connection.cursor() as cursor:
-        # Fetch existing record
-        cursor.execute("SELECT id, newsHde, news FROM newsmalayalam WHERE id = %s", [news_id])
+        cursor.execute(
+            f"SELECT id, newsHde, news, newsType, status_mge FROM {db} WHERE id = %s",
+            [news_id]
+        )
         row = cursor.fetchone()
         if not row:
             return None
-        
+
         news_data = {"id": row[0], "title": row[1], "content": row[2]}
         news_data = fix_mojibake(news_data)
 
+        news_type = row[3] or "NEWS"
+        mge = row[4] or 0  # fallback if status_mge is NULL
+
         # Update status
-        cursor.execute("UPDATE newsmalayalam SET status_cur = %s WHERE id = %s", [new_status, news_id])
+        cursor.execute(
+            f"UPDATE {db} SET status_cur = %s WHERE id = %s",
+            [new_status, news_id]
+        )
+
+        if new_status == 1:  # Deleted
+            move_to_resycle_table(news_id, mge, news_type, db)
+
         return news_data
     
 # permanently delete news
@@ -160,9 +181,7 @@ def permanently_delete_news(news_id):
     with connection.cursor() as cursor:
         cursor.execute("DELETE FROM newsmalayalam WHERE id = %s", [news_id]) 
         return {"id": news_id, "status": "deleted"}
-        
-        
-    
+          
 # restore news
 def restore_news(news_id):
     with connection.cursor() as cursor:
