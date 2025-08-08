@@ -47,8 +47,29 @@
 						"disableBodyPruning": true
 					},
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2OTYsImlhdCI6MTc1NDQ4OTUyMSwiZXhwIjoxNzU3MDgxNTIxfQ.pI0K58UfPEi3tZ_5O-wQAdn0MvfjSVuPlPGTYkfT5Cs",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/news/346661/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"news",
+								"346661",
+								""
+							]
+						}
 					},
 					"response": []
 				},
@@ -60,7 +81,17 @@
 					},
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/newsTypes/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"newsTypes",
+								""
+							]
+						}
 					},
 					"response": []
 				},
