@@ -33,13 +33,12 @@ def get_news(request):
 
 @jwt_required
 def get_comments(request):
+    user_id = getattr(request, "user_id", None)
+    if not user_id:
+        raise ValueError("User ID is missing. Did you forget to protect the route with @jwt_required?")
     return get_paginated_list(request, "cmd2", order_by="id")
 
 
-# def advertise(request):
-#     return get_paginated_list(request, "advertisement_new", order_by="id")
-
-@jwt_required
 def get_comments_for_record(record_id, table_name):
     with connection.cursor() as cursor:
         cursor.execute(
@@ -54,7 +53,6 @@ def get_comments_for_record(record_id, table_name):
 
 
 # -------- Fetch data by ID --------
-@jwt_required
 def get_record_by_id_view(request, table_name, record_id, field_map=None):
     record = get_record_by_id(table_name, record_id, field_map)
     if not record:
@@ -80,7 +78,6 @@ def get_record_by_id_view(request, table_name, record_id, field_map=None):
         "payload": data
     }, safe=False, json_dumps_params={"ensure_ascii": False})
 
-@jwt_required
 def get_news_by_id_views(request, news_id):
     return get_record_by_id_view(
         request,
@@ -97,7 +94,6 @@ def get_news_by_id_views(request, news_id):
         },
     )
 
-@jwt_required
 def get_comments_by_id_views(request, id):
     return get_record_by_id_view(
         request,
@@ -225,7 +221,7 @@ def add_news_view(request, newsType=None):  # <-- Capture from URL
         newsHde = request.POST.get("newsHde")
         news = request.POST.get("news")
         language = request.POST.get("language")
-        name = request.POST.get("byline")
+        name = request.POST.get("name")
 
         # Validate required fields
         required_fields = {
@@ -337,95 +333,57 @@ def add_news_view(request, newsType=None):  # <-- Capture from URL
 @csrf_exempt
 def edit_news_view(request, news_id):
     if request.method == "GET":
-        # Fetch existing news by ID
         with connection.cursor() as cursor:
             cursor.execute("SELECT * FROM newsmalayalam WHERE id = %s", [news_id])
             row = cursor.fetchone()
-
             if not row:
                 return JsonResponse({"error": "News not found"}, status=404)
-
-            # Get column names
             columns = [col[0] for col in cursor.description]
             news_data = dict(zip(columns, row))
+        return JsonResponse(news_data, json_dumps_params={"ensure_ascii": False}, safe=False)
 
-        return JsonResponse(
-            news_data, json_dumps_params={"ensure_ascii": False}, safe=False
-        )
+    elif request.method == "POST":
+        # ✅ Extract everything from request.POST without manually listing fields
+        data = request.POST.dict()  # gets all POST fields as dictionary
+        data["upddate"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        data["status_mge"] = getattr(request, "user_id", None)
 
-    elif request.method == "PATCH":
-        date_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        fields = {
-            "newsType": request.POST.get("newsType"),
-            "newsHde": request.POST.get("heading"),
-            "news": request.POST.get("news"),
-            "images2": request.POST.get("images2", ""),
-            "name": request.POST.get("name"),
-            "news2": request.POST.get("content", ""),
-            "images": request.POST.get("images", ""),
-            "fdfNte": request.POST.get("fdfNte", ""),
-            "language": request.POST.get("language", "ml"),
-            "top": request.POST.get("top", 0),
-            "slider": request.POST.get("slider", 0),
-            "upddate": date_now,
-            "imgVisibility": request.POST.get("imgVisibility"),
-            "status_cur": request.POST.get("status_cur", 0),
-            "status_mge": getattr(request, "user_id", None),
-            "copy": request.POST.get("copy"),
-            "copyid": request.POST.get("copyid"),
-            "writer": request.POST.get("writer"),
-            "facebook_pubstatus": request.POST.get("facebook_pubstatus"),
-            "fbprofile_pubstatus": request.POST.get("fbprofile_pubstatus"),
-            "fbprofile2_pubstatus": request.POST.get("fbprofile2_pubstatus"),
-            "tag": request.POST.get("tag"),
-            "thumbimage": request.POST.get("thumbimage"),
-            "disable_comments": 0 if request.POST.get("disable") else 1,
-            "paid": 0 if request.POST.get("premium_read") else 1,
-            "cdn": request.POST.get("cdn", ""),
-            "scheduled_at": request.POST.get("scheduled_at"),
-            "content_type": request.POST.get("content_type", "text"),
-            "video_type": request.POST.get("video_type"),
-            "video_url": request.POST.get("video_url"),
-        }
-
-        # Handle file uploads
-        pdf_file = request.FILES.get("pdf_file")
-        if pdf_file:
+        # ✅ File handling
+        if "pdf_file" in request.FILES:
+            pdf_file = request.FILES["pdf_file"]
             pdf_path = f"uploads/pdf/{pdf_file.name}"
-            with open(f"media/{pdf_path}", "wb+") as destination:
+            os.makedirs(os.path.dirname(f"media/{pdf_path}"), exist_ok=True)
+            with open(f"media/{pdf_path}", "wb+") as dest:
                 for chunk in pdf_file.chunks():
-                    destination.write(chunk)
-            fields["pdf"] = pdf_path
+                    dest.write(chunk)
+            data["pdf"] = pdf_path
 
-        uploaded_files = request.FILES.getlist("multi_images")
-        if uploaded_files:
+        if request.FILES.getlist("multi_images"):
             image_paths = []
-            for file in uploaded_files:
+            for file in request.FILES.getlist("multi_images"):
                 file_path = f"uploads/{file.name}"
-                with open(f"media/{file_path}", "wb+") as destination:
+                os.makedirs(os.path.dirname(f"media/{file_path}"), exist_ok=True)
+                with open(f"media/{file_path}", "wb+") as dest:
                     for chunk in file.chunks():
-                        destination.write(chunk)
+                        dest.write(chunk)
                 image_paths.append(file_path)
-            fields["images"] = ",".join(image_paths)
+            data["images"] = ",".join(image_paths)
 
-        # Build dynamic SQL
-        set_clause = ", ".join([f"`{col}`=%s" for col in fields.keys()])
-        values = list(fields.values())
+        # ✅ Build SQL dynamically
+        set_clause = ", ".join([f"`{key}`=%s" for key in data])
+        values = list(data.values())
         values.append(news_id)
 
         with connection.cursor() as cursor:
-            cursor.execute(
-                f"UPDATE newsmalayalam SET {set_clause} WHERE id = %s", values
-            )
+            cursor.execute(f"UPDATE newsmalayalam SET {set_clause} WHERE id = %s", values)
+            if cursor.rowcount == 0:
+                return JsonResponse({"error": "No rows updated. Check ID or data."}, status=400)
 
-        return JsonResponse(
-            {
-                "message": "News updated successfully",
-                "id": news_id,
-                "updated_fields": fields,
-            },
-            json_dumps_params={"ensure_ascii": False},
-        )
+        return JsonResponse({
+            "message": "News updated successfully",
+            "id": news_id,
+            "updated_fields": data
+        })
 
     return JsonResponse({"error": "Method not allowed"}, status=405)
 

@@ -88,7 +88,7 @@ urlpatterns = [
     # add charamam 
     path('add-obituaries/', add_charamam_entry, name='add-obituaries'),
     # delete obituaries
-    path('delete-obituaries/', delete_charamam_entry, name='delete-obituaries'),
+    path('delete-obituaries/<int:id>/', delete_charamam_entry, name='delete-obituaries'),
     
     
 
