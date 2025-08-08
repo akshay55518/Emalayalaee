@@ -344,8 +344,29 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2OTYsImlhdCI6MTc1NDQ4OTUyMSwiZXhwIjoxNzU3MDgxNTIxfQ.pI0K58UfPEi3tZ_5O-wQAdn0MvfjSVuPlPGTYkfT5Cs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/delete-news/346691/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"delete-news",
+								"346691",
+								""
+							]
+						}
 					},
 					"response": []
 				},
