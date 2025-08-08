@@ -861,8 +861,30 @@
 						"disableBodyPruning": true
 					},
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMCwiaWF0IjoxNzU0MjgzMzQxLCJleHAiOjE3NTY4NzUzNDF9.ahnkvnk7OlmUHiPTtr1O1gppK_DAC8daR12RVzjNsZI",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/post-marked-social/346660/3/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"post-marked-social",
+								"346660",
+								"3",
+								""
+							]
+						}
 					},
 					"response": []
 				}
